@@ -16,9 +16,7 @@ import (
 	"time"
 )
 
-/*
- * CreateClient client with all necessary data
- */
+// CreateClient client with all necessary data
 func CreateClient(client *model.Client) (*model.Client, error) {
 	u := uuid.NewV4()
 	client.Id = u.String()
@@ -85,9 +83,7 @@ func CreateClient(client *model.Client) (*model.Client, error) {
 	return client, nil
 }
 
-/*
- * ReadClient client by id
- */
+// ReadClient client by id
 func ReadClient(id string) (*model.Client, error) {
 	v, err := deserialize(id)
 	if err != nil {
@@ -98,9 +94,7 @@ func ReadClient(id string) (*model.Client, error) {
 	return client, nil
 }
 
-/*
- * ReadClientConfig in wg format
- */
+// ReadClientConfig in wg format
 func ReadClientConfig(id string) ([]byte, error) {
 	client, err := ReadClient(id)
 	if err != nil {
@@ -120,9 +114,7 @@ func ReadClientConfig(id string) ([]byte, error) {
 	return configDataWg.Bytes(), nil
 }
 
-/*
- * UpdateClient preserve keys
- */
+// UpdateClient preserve keys
 func UpdateClient(Id string, client *model.Client) (*model.Client, error) {
 	v, err := deserialize(Id)
 	if err != nil {
@@ -153,9 +145,7 @@ func UpdateClient(Id string, client *model.Client) (*model.Client, error) {
 	return client, nil
 }
 
-/*
- * DeleteClient from disk
- */
+// DeleteClient from disk
 func DeleteClient(id string) error {
 	path := filepath.Join(os.Getenv("WG_CONF_DIR"), id)
 	err := os.Remove(path)
@@ -167,9 +157,7 @@ func DeleteClient(id string) error {
 	return generateWgConfig()
 }
 
-/*
- * ReadClients all clients
- */
+// ReadClients all clients
 func ReadClients() ([]*model.Client, error) {
 	clients := make([]*model.Client, 0)
 
@@ -201,9 +189,7 @@ func ReadClients() ([]*model.Client, error) {
 	return clients, nil
 }
 
-/*
- * ReadServer object, create default one
- */
+// ReadServer object, create default one
 func ReadServer() (*model.Server, error) {
 	if !util.FileExists(filepath.Join(os.Getenv("WG_CONF_DIR"), "server.json")) {
 		server := &model.Server{}
@@ -244,9 +230,7 @@ func ReadServer() (*model.Server, error) {
 	return c.(*model.Server), nil
 }
 
-/*
- * UpdateServer keep private values from existing one
- */
+// UpdateServer keep private values from existing one
 func UpdateServer(server *model.Server) (*model.Server, error) {
 	current, err := deserialize("server.json")
 	if err != nil {
@@ -272,9 +256,7 @@ func UpdateServer(server *model.Server) (*model.Server, error) {
 	return server, nil
 }
 
-/*
- * Write object to disk
- */
+// Write object to disk
 func serialize(id string, c interface{}) error {
 	b, err := json.Marshal(c)
 	if err != nil {
@@ -290,9 +272,7 @@ func serialize(id string, c interface{}) error {
 	return generateWgConfig()
 }
 
-/*
- * Read client from disc
- */
+// Read client from disc
 func deserializeClient(data []byte) (*model.Client, error) {
 	var c *model.Client
 	err := json.Unmarshal(data, &c)
@@ -303,9 +283,7 @@ func deserializeClient(data []byte) (*model.Client, error) {
 	return c, nil
 }
 
-/*
- * Read server from disc
- */
+// Read server from disc
 func deserializeServer(data []byte) (*model.Server, error) {
 	var c *model.Server
 	err := json.Unmarshal(data, &c)
@@ -329,9 +307,7 @@ func deserialize(id string) (interface{}, error) {
 	return deserializeClient(b)
 }
 
-/*
- * Generate Wireguard interface configuration
- */
+// Generate Wireguard interface configuration
 func generateWgConfig() error {
 	clients, err := ReadClients()
 	if err != nil {
