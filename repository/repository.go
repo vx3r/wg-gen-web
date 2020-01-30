@@ -17,7 +17,7 @@ import (
 )
 
 /*
- * Create client with all necessary data
+ * CreateClient client with all necessary data
  */
 func CreateClient(client *model.Client) (*model.Client, error) {
 	u := uuid.NewV4()
@@ -86,7 +86,7 @@ func CreateClient(client *model.Client) (*model.Client, error) {
 }
 
 /*
- * Read client by id
+ * ReadClient client by id
  */
 func ReadClient(id string) (*model.Client, error) {
 	v, err := deserialize(id)
@@ -99,7 +99,7 @@ func ReadClient(id string) (*model.Client, error) {
 }
 
 /*
- * Get client config ion wg format
+ * ReadClientConfig in wg format
  */
 func ReadClientConfig(id string) ([]byte, error) {
 	client, err := ReadClient(id)
@@ -121,7 +121,7 @@ func ReadClientConfig(id string) ([]byte, error) {
 }
 
 /*
- * Update client preserve keys
+ * UpdateClient preserve keys
  */
 func UpdateClient(Id string, client *model.Client) (*model.Client, error) {
 	v, err := deserialize(Id)
@@ -154,7 +154,7 @@ func UpdateClient(Id string, client *model.Client) (*model.Client, error) {
 }
 
 /*
- * Delete client from disk
+ * DeleteClient from disk
  */
 func DeleteClient(id string) error {
 	path := filepath.Join(os.Getenv("WG_CONF_DIR"), id)
@@ -168,7 +168,7 @@ func DeleteClient(id string) error {
 }
 
 /*
- * Read all clients
+ * ReadClients all clients
  */
 func ReadClients() ([]*model.Client, error) {
 	clients := make([]*model.Client, 0)
@@ -202,7 +202,7 @@ func ReadClients() ([]*model.Client, error) {
 }
 
 /*
- * Return server object, create default one
+ * ReadServer object, create default one
  */
 func ReadServer() (*model.Server, error) {
 	if !util.FileExists(filepath.Join(os.Getenv("WG_CONF_DIR"), "server.json")) {
@@ -245,7 +245,7 @@ func ReadServer() (*model.Server, error) {
 }
 
 /*
- * Update server, keep private values from existing one
+ * UpdateServer keep private values from existing one
  */
 func UpdateServer(server *model.Server) (*model.Server, error) {
 	current, err := deserialize("server.json")

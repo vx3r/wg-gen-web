@@ -2,7 +2,7 @@ package model
 
 import "time"
 
-// client structure
+// Client structure
 type Client struct {
 	Id         string    `json:"id"`
 	Name       string    `json:"name"`

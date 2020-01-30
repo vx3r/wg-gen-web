@@ -40,7 +40,7 @@ AllowedIPs = {{.Address}}
 	{{end}}`
 )
 
-// dump client wg config with go template
+// DumpClient dump client wg config with go template
 func DumpClient(client *model.Client, server *model.Server) (bytes.Buffer, error) {
 	var tplBuff bytes.Buffer
 
@@ -58,7 +58,7 @@ func DumpClient(client *model.Client, server *model.Server) (bytes.Buffer, error
 	})
 }
 
-// dump server wg config with go template
+// DumpServerWg dump server wg config with go template
 func DumpServerWg(clients []*model.Client, server *model.Server) (bytes.Buffer, error) {
 	var tplBuff bytes.Buffer
 

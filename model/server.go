@@ -2,7 +2,7 @@ package model
 
 import "time"
 
-// server structure
+// Server structure
 type Server struct {
 	Name                string    `json:"name"`
 	Created             time.Time `json:"created"`
