@@ -11,7 +11,7 @@ Simple Web based configuration generator for [WireGuard](https://wireguard.com).
 
 ## Whay another one ?
 
-All WireGuard UI implementation are trying to manage the service by applying configurations and creating network rules.
+All WireGuard UI implementations are trying to manage the service by applying configurations and creating network rules.
 This implementation only generate configuration and its up to you to create network rules and apply configuration to WireGuard.
 For example by monituring generated directory with [inotifywait](https://github.com/inotify-tools/inotify-tools/wiki). 
 
@@ -30,11 +30,11 @@ The goal is to run Wg Gen Web in a container and WireGuard on host system.
 
 ## Running
 
-The easiest way to run wireguard-ui is using the container image
+The easiest way to run Wg Gen Web is using the container image
 ```
 docker run --rm -it -v /tmp/wireguard:/data -p 8080:8080 -e "WG_CONF_DIR=/data" vx3r/wg-gen-web:latest
 ```
-docker compose snipped
+Docker compose snipped
 ```
 version: '3.6'
 services:
