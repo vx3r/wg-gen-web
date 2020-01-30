@@ -1,0 +1,35 @@
+stages:
+  - build
+  - deploy
+
+build-back:
+  stage: build
+  image: golang:latest
+  script:
+    - GOOS=linux GOARCH=amd64 go build -o ${CI_PROJECT_NAME}-linux-amd64
+  artifacts:
+    paths:
+      - ${CI_PROJECT_NAME}-linux-amd64
+
+build-front:
+  stage: build
+  image: node:10-alpine
+  script:
+    - cd ./ui
+    - npm install
+    - npm run build
+    - cd ..
+  artifacts:
+    paths:
+      - ui/dist
+
+deploy:
+  stage: deploy
+  image: docker:latest
+  only:
+    - master
+  script:
+    - docker login -u ${CI_REGISTRY_USER} -p ${REGISTRY_PASSWORD} ${CI_REGISTRY}
+    - docker build --tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA} --tag ${CI_REGISTRY_IMAGE}:latest .
+    - docker push ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}
+    - docker push ${CI_REGISTRY_IMAGE}:latest

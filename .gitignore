@@ -1,0 +1,34 @@
+# Vendor
+vendor/*
+
+*.exe
+
+.idea/*
+
+wireguard
+
+ui/.idea/*
+ui/dist/*
+
+.DS_Store
+ui/node_modules
+/dist
+
+# local env files
+ui/.env.local
+ui/.env.*.local
+
+.idea
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor directories and files
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
