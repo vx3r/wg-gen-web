@@ -11,7 +11,7 @@ Simple Web based configuration generator for [WireGuard](https://wireguard.com).
 
 ## Whay another one ?
 
-All WireGuard UI implementation are trying to manage the WireGuard by applying configurations or creation network rules.
+All WireGuard UI implementation are trying to manage the service by applying configurations and creating network rules.
 This implementation only generate configuration and its up to you to create network rules and apply configuration to WireGuard.
 For example by monituring generated directory with [inotifywait](https://github.com/inotify-tools/inotify-tools/wiki). 
 
@@ -50,6 +50,51 @@ services:
     volumes:
       - /mnt/raid-lv-data/docker-persistent-data/wg-gen-web:/data
 ```
+## How to trigger WireGuard on host
+
+Before going further create a symlink from docker mounted volume to `/etc/wireguard`
+```
+ln -s /mnt/raid-lv-data/docker-persistent-data/wg-gen-web /etc/wireguard
+```
+
+### Example with ```systemd```
+Using `systemd.path` monitor for directory changes see [systemd doc](https://www.freedesktop.org/software/systemd/man/systemd.path.html)
+```
+# /etc/systemd/system/wg-gen-web.path
+[Unit]
+Description=Watch /etc/wireguard for changes
+
+[Path]
+PathModified=/etc/wireguard
+
+[Install]
+WantedBy=multi-user.target
+```
+This `.path` will activate unit file with the same name
+```
+# /etc/systemd/system/wg-gen-web.service
+[Unit]
+Description=Restart WireGuard
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/systemctl restart wg-quick@wg0.service
+
+[Install]
+WantedBy=multi-user.target
+```
+Which will restart WireGuard service 
+
+### Example with ```inotifywait```
+Using whatever init system create a daemon running this script
+```
+#!/bin/sh
+while inotifywait -e modify -e create /etc/wireguard; do
+  wg-quick down wg0
+  wg-quick up wg0
+done
+```
 
 ## What is out of scope
 
@@ -58,7 +103,6 @@ services:
 
 ## TODO
 
- * Full setup example with `inotifywait` and `systemd`
  * Multi-user support behind [Authelia](https://github.com/authelia/authelia) (suggestions / thoughts are welcome)
  * Send configs by email to client
  
