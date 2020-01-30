@@ -16,6 +16,9 @@ import (
 	"time"
 )
 
+/*
+ * Create client with all necessary data
+ */
 func CreateClient(client *model.Client) (*model.Client, error) {
 	u := uuid.NewV4()
 	client.Id = u.String()
@@ -37,10 +40,10 @@ func CreateClient(client *model.Client) (*model.Client, error) {
 	for _, client := range clients {
 		ips := strings.Split(client.Address, ",")
 		for i := range ips {
-			if util.IsIPv6(ips[i]){
-				ips[i] = strings.ReplaceAll(strings.TrimSpace(ips[i]), "/128","")
+			if util.IsIPv6(ips[i]) {
+				ips[i] = strings.ReplaceAll(strings.TrimSpace(ips[i]), "/128", "")
 			} else {
-				ips[i] = strings.ReplaceAll(strings.TrimSpace(ips[i]), "/32","")
+				ips[i] = strings.ReplaceAll(strings.TrimSpace(ips[i]), "/32", "")
 			}
 		}
 		reserverIps = append(reserverIps, ips...)
@@ -56,7 +59,7 @@ func CreateClient(client *model.Client) (*model.Client, error) {
 		if err != nil {
 			return nil, err
 		}
-		if util.IsIPv6(ip){
+		if util.IsIPv6(ip) {
 			ip = ip + "/128"
 		} else {
 			ip = ip + "/32"
@@ -64,7 +67,7 @@ func CreateClient(client *model.Client) (*model.Client, error) {
 		ips = append(ips, ip)
 	}
 	client.Address = strings.Join(ips, ",")
-	
+
 	client.Created = time.Now().UTC()
 	client.Updated = client.Created
 
@@ -82,6 +85,9 @@ func CreateClient(client *model.Client) (*model.Client, error) {
 	return client, nil
 }
 
+/*
+ * Read client by id
+ */
 func ReadClient(id string) (*model.Client, error) {
 	v, err := deserialize(id)
 	if err != nil {
@@ -92,6 +98,9 @@ func ReadClient(id string) (*model.Client, error) {
 	return client, nil
 }
 
+/*
+ * Get client config ion wg format
+ */
 func ReadClientConfig(id string) ([]byte, error) {
 	client, err := ReadClient(id)
 	if err != nil {
@@ -111,6 +120,9 @@ func ReadClientConfig(id string) ([]byte, error) {
 	return configDataWg.Bytes(), nil
 }
 
+/*
+ * Update client preserve keys
+ */
 func UpdateClient(Id string, client *model.Client) (*model.Client, error) {
 	v, err := deserialize(Id)
 	if err != nil {
@@ -141,6 +153,9 @@ func UpdateClient(Id string, client *model.Client) (*model.Client, error) {
 	return client, nil
 }
 
+/*
+ * Delete client from disk
+ */
 func DeleteClient(id string) error {
 	path := filepath.Join(os.Getenv("WG_CONF_DIR"), id)
 	err := os.Remove(path)
@@ -152,6 +167,9 @@ func DeleteClient(id string) error {
 	return generateWgConfig()
 }
 
+/*
+ * Read all clients
+ */
 func ReadClients() ([]*model.Client, error) {
 	clients := make([]*model.Client, 0)
 
@@ -253,6 +271,7 @@ func UpdateServer(server *model.Server) (*model.Server, error) {
 
 	return server, nil
 }
+
 /*
  * Write object to disk
  */
@@ -270,6 +289,7 @@ func serialize(id string, c interface{}) error {
 	// data modified, dump new config
 	return generateWgConfig()
 }
+
 /*
  * Read client from disc
  */
@@ -282,6 +302,7 @@ func deserializeClient(data []byte) (*model.Client, error) {
 
 	return c, nil
 }
+
 /*
  * Read server from disc
  */
@@ -307,6 +328,7 @@ func deserialize(id string) (interface{}, error) {
 
 	return deserializeClient(b)
 }
+
 /*
  * Generate Wireguard interface configuration
  */

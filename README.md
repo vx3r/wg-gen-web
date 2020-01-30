@@ -2,6 +2,13 @@
 
 Simple Web based configuration generator for [WireGuard](https://wireguard.com).
 
+---
+
+<p align="left">
+    <a href="https://goreportcard.com/report/github.com/vx3r/wg-gen-web"><img src="https://goreportcard.com/badge/github.com/vx3r/wg-gen-web" alt="Go Report Card"></a>
+    <a href="https://gitlab.127-0-0-1.fr/vx3r/wg-gen-web/commits/master"><img src="https://gitlab.127-0-0-1.fr/vx3r/wg-gen-web/badges/master/pipeline.svg" alt="Gitlab CI / CD"></a>
+</p>
+
 ## Whay another one ?
 
 All WireGuard UI implementation are trying to manage the WireGuard by applying configurations or creation network rules.

@@ -29,7 +29,6 @@ func ApplyRoutes(r *gin.Engine) {
 	}
 }
 
-
 func createClient(c *gin.Context) {
 	var data model.Client
 
@@ -136,19 +135,18 @@ func configClient(c *gin.Context) {
 		c.Header("Content-Disposition", "attachment; filename=wg0.conf")
 		c.Data(http.StatusOK, "application/config", configData)
 		return
-	} else {
-		// return config as png qrcode
-		png, err := qrcode.Encode(string(configData), qrcode.Medium, 220)
-		if err != nil {
-			log.WithFields(log.Fields{
-				"err": err,
-			}).Error("failed to create qrcode")
-			c.AbortWithStatus(http.StatusInternalServerError)
-			return
-		}
-		c.Data(http.StatusOK, "image/png", png)
+	}
+	// return config as png qrcode
+	png, err := qrcode.Encode(string(configData), qrcode.Medium, 220)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"err": err,
+		}).Error("failed to create qrcode")
+		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
+	c.Data(http.StatusOK, "image/png", png)
+	return
 }
 
 func readServer(c *gin.Context) {

@@ -40,6 +40,7 @@ AllowedIPs = {{.Address}}
 	{{end}}`
 )
 
+// dump client wg config with go template
 func DumpClient(client *model.Client, server *model.Server) (bytes.Buffer, error) {
 	var tplBuff bytes.Buffer
 
@@ -57,6 +58,7 @@ func DumpClient(client *model.Client, server *model.Server) (bytes.Buffer, error
 	})
 }
 
+// dump server wg config with go template
 func DumpServerWg(clients []*model.Client, server *model.Server) (bytes.Buffer, error) {
 	var tplBuff bytes.Buffer
 
@@ -66,17 +68,17 @@ func DumpServerWg(clients []*model.Client, server *model.Server) (bytes.Buffer, 
 	}
 
 	return dump(t, struct {
-		Clients []*model.Client
-		Server *model.Server
+		Clients        []*model.Client
+		Server         *model.Server
 		ServerAdresses []string
 	}{
 		ServerAdresses: strings.Split(server.Address, ","),
-		Clients: clients,
-		Server: server,
+		Clients:        clients,
+		Server:         server,
 	})
 }
 
-func dump(tpl *template.Template , data interface{}) (bytes.Buffer, error) {
+func dump(tpl *template.Template, data interface{}) (bytes.Buffer, error) {
 	var tplBuff bytes.Buffer
 
 	err := tpl.Execute(&tplBuff, data)

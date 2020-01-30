@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+// read file content
 func ReadFile(path string) (bytes []byte, err error) {
 	bytes, err = ioutil.ReadFile(path)
 	if err != nil {
@@ -17,6 +18,7 @@ func ReadFile(path string) (bytes []byte, err error) {
 	return bytes, nil
 }
 
+// write content to file
 func WriteFile(path string, bytes []byte) (err error) {
 	err = ioutil.WriteFile(path, bytes, 0644)
 	if err != nil {
@@ -26,6 +28,7 @@ func WriteFile(path string, bytes []byte) (err error) {
 	return nil
 }
 
+// check if file exists
 func FileExists(name string) bool {
 	info, err := os.Stat(name)
 	if os.IsNotExist(err) {
@@ -34,6 +37,7 @@ func FileExists(name string) bool {
 	return !info.IsDir()
 }
 
+// check if directory exists
 func DirectoryExists(name string) bool {
 	info, err := os.Stat(name)
 	if os.IsNotExist(err) {
@@ -42,6 +46,7 @@ func DirectoryExists(name string) bool {
 	return info.IsDir()
 }
 
+// search for an available in cidr against a list of reserved ips
 func GetAvailableIp(cidr string, reserved []string) (string, error) {
 	addresses, err := GetAllAddressesFromCidr(cidr)
 	if err != nil {
@@ -64,6 +69,7 @@ func GetAvailableIp(cidr string, reserved []string) (string, error) {
 	return "", errors.New("no more available address from cidr")
 }
 
+// get all ip addresses from cidr
 func GetAllAddressesFromCidr(cidr string) ([]string, error) {
 	ip, ipnet, err := net.ParseCIDR(cidr)
 	if err != nil {
@@ -88,6 +94,7 @@ func inc(ip net.IP) {
 	}
 }
 
+// check if given ip is IPv6
 func IsIPv6(address string) bool {
 	return strings.Count(address, ":") >= 2
 }
