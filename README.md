@@ -54,9 +54,10 @@ services:
     volumes:
       - /etc/wireguard:/data
 ```
-Please note that mapping /etc/wireguard to /data inside the docker, will erase your host's current configuration.
-If needed, please make sure to backup your files within /etc/wireguard.
-A workaround would be to change the WG_INTERFACE_NAME to something different, as it will create a new interface (wg-auto.conf for example), note that if you do so, you will have to adapt your daemon accordingly.
+Please note that mapping ```/etc/wireguard``` to ```/data``` inside the docker, will erase your host's current configuration.
+If needed, please make sure to backup your files from ```/etc/wireguard```.
+
+A workaround would be to change the ```WG_INTERFACE_NAME``` to something different, as it will create a new interface (```wg-auto.conf``` for example), note that if you do so, you will have to adapt your daemon accordingly.
 ### Automatically apply changes using ```systemd```
 Using `systemd.path` monitor for directory changes see [systemd doc](https://www.freedesktop.org/software/systemd/man/systemd.path.html)
 ```
