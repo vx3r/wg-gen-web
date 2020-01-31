@@ -171,6 +171,7 @@
                               v-on="on"
                               color="success"
                               v-model="client.enable"
+                              v-on:change="updateClient(client)"
                       />
                     </template>
                     <span>Enable or disable this client</span>
@@ -297,7 +298,7 @@
           <v-btn
                   :disabled="!valid"
                   color="success"
-                  @click="updateClient()"
+                  @click="updateClient(clientToEdit)"
           >
             Submit
           </v-btn>
@@ -376,6 +377,9 @@
         });
       },
       updateServer () {
+        // convert int values
+        this.server.listenPort = parseInt(this.server.listenPort, 10);
+        this.server.persistentKeepalive = parseInt(this.server.persistentKeepalive, 10);
         this.$patch('/server', this.server).then((res) => {
           this.notify('success', "Server successfully updated");
           this.getData()
@@ -414,9 +418,9 @@
           return `${base}/client/${id}/config`
         }
       },
-      updateClient() {
+      updateClient(client) {
         this.dialogEditClient = false;
-        this.$patch(`/client/${this.clientToEdit.id}`, this.clientToEdit).then((res) => {
+        this.$patch(`/client/${client.id}`, client).then((res) => {
           this.notify('success', "Client successfully updated");
           this.getData()
         }).catch((e) => {

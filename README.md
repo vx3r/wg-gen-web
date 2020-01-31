@@ -4,10 +4,14 @@ Simple Web based configuration generator for [WireGuard](https://wireguard.com).
 
 ---
 
-<p align="left">
-    <a href="https://goreportcard.com/report/github.com/vx3r/wg-gen-web"><img src="https://goreportcard.com/badge/github.com/vx3r/wg-gen-web" alt="Go Report Card"></a>
-    <a href="https://gitlab.127-0-0-1.fr/vx3r/wg-gen-web/commits/master"><img src="https://gitlab.127-0-0-1.fr/vx3r/wg-gen-web/badges/master/pipeline.svg" alt="Gitlab CI / CD"></a>
-</p>
+[![pipeline status](https://gitlab.127-0-0-1.fr/vx3r/wg-gen-web/badges/master/pipeline.svg)](https://gitlab.127-0-0-1.fr/vx3r/wg-gen-web/commits/master)
+[![Go Report Card](https://goreportcard.com/badge/github.com/vx3r/wg-gen-web)](https://goreportcard.com/report/github.com/vx3r/wg-gen-web)
+![Gitlab pipeline status (self-hosted)](https://img.shields.io/gitlab/pipeline/vx3r/wg-gen-web?gitlab_url=https%3A%2F%2Fgitlab.127-0-0-1.fr%2F)
+[![License: WTFPL](https://img.shields.io/badge/License-WTFPL-brightgreen.svg)](http://www.wtfpl.net/about/)
+![GitHub last commit](https://img.shields.io/github/last-commit/vx3r/wg-gen-web)
+![Docker Pulls](https://img.shields.io/docker/pulls/vx3r/wg-gen-web)
+![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/vx3r/wg-gen-web)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/vx3r/wg-gen-web)
 
 ## Whay another one ?
 
@@ -95,6 +99,12 @@ while inotifywait -e modify -e create /etc/wireguard; do
   wg-quick up wg0
 done
 ```
+
+## How to use with existing WireGuard configuration
+
+After first run Wg Gen Web will create `server.json` in data directory with alla server informations.
+
+Fill free to modify this file in order to use your existing keys
 
 ## What is out of scope
 
