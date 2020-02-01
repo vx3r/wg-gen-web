@@ -258,7 +258,7 @@ func UpdateServer(server *model.Server) (*model.Server, error) {
 
 // Write object to disk
 func serialize(id string, c interface{}) error {
-	b, err := json.Marshal(c)
+	b, err := json.MarshalIndent(c, "", "  ")
 	if err != nil {
 		return err
 	}
