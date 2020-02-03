@@ -124,7 +124,7 @@ Feel free to modify this file in order to use your existing keys
 ## What is out of scope
 
  * Generation or application of any `iptables` or `nftables` rules
- * Application of configuration to WireGuard
+ * Application of configuration to WireGuard by Wg Gen Web itself
 
 ## TODO
 

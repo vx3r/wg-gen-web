@@ -1,0 +1,20 @@
+FROM golang as build-back
+WORKDIR /wg-gen-web
+ADD . .
+RUN go build -o wg-gen-web-linux-amd64
+
+FROM node:10-alpine as build-front
+WORKDIR /ui
+ADD ui .
+RUN npm install
+RUN npm run build
+
+FROM debian:stable-slim
+WORKDIR /app
+COPY --from=build-back /wg-gen-web/wg-gen-web-linux-amd64 .
+COPY --from=build-front /ui/dist ./ui/dist
+ADD .env .
+RUN chmod +x ./wg-gen-web-linux-amd64
+EXPOSE 8080
+
+CMD ["/app/wg-gen-web-linux-amd64"]
