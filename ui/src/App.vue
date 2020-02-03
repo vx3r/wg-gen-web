@@ -2,6 +2,7 @@
   <v-app id="inspire">
 
     <v-app-bar app>
+      <img class="mr-3" :src="require('./assets/logo.png')" height="50"/>
       <v-toolbar-title>Wg Gen Web</v-toolbar-title>
     </v-app-bar>
 

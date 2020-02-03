@@ -20,6 +20,7 @@ func ApplyRoutes(r *gin.Engine) {
 		client.DELETE("/:id", deleteClient)
 		client.GET("", readClients)
 		client.GET("/:id/config", configClient)
+		client.GET("/:id/email", emailClient)
 	}
 
 	server := r.Group("/api/v1.0/server")
@@ -147,6 +148,21 @@ func configClient(c *gin.Context) {
 	}
 	c.Data(http.StatusOK, "image/png", png)
 	return
+}
+
+func emailClient(c *gin.Context) {
+	id := c.Param("id")
+
+	err := repository.EmailClient(id)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"err": err,
+		}).Error("failed to send email to client")
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{})
 }
 
 func readServer(c *gin.Context) {

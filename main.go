@@ -40,7 +40,10 @@ func main() {
 		}
 	}
 
-	if os.Getenv("GIN_MODE") == "release" {
+	if os.Getenv("GIN_MODE") == "debug" {
+		// set gin release mode
+		gin.SetMode(gin.DebugMode)
+	} else {
 		// set gin release mode
 		gin.SetMode(gin.ReleaseMode)
 		// disable console color

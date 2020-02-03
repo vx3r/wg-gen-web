@@ -13,15 +13,15 @@
               <v-text-field
                       v-model="server.name"
                       :rules="[
-                          v => !!v || 'Name is required',
+                          v => !!v || 'Friendly name is required',
                         ]"
-                      label="Friendly server name"
+                      label="Friendly name"
                       required
               />
               <v-text-field
                       type="number"
                       v-model="server.persistentKeepalive"
-                      label="Persistent keepalive for clients"
+                      label="Persistent keepalive"
                       :rules="[
                           v => !!v || 'Persistent keepalive is required',
                         ]"
@@ -29,9 +29,9 @@
               />
               <v-text-field
                       v-model="server.endpoint"
-                      label="Endpoint for clients to connect to"
+                      label="Public endpoint for clients to connect to"
                       :rules="[
-                          v => !!v || 'Endpoint is required',
+                          v => !!v || 'Public endpoint for clients to connect to is required',
                         ]"
                       required
               />
@@ -47,12 +47,12 @@
             <v-col cols="6">
               <v-text-field
                       v-model="server.publicKey"
-                      label="Server public key"
+                      label="Public key"
                       disabled
               />
               <v-text-field
                       v-model="server.presharedKey"
-                      label="Preshared Key key"
+                      label="Preshared key"
                       disabled
               />
               <v-text-field
@@ -69,7 +69,7 @@
                       :rules="[
                           v => !!v || 'Listen port is required',
                         ]"
-                      label="Server listen port"
+                      label="Listen port"
                       required
               />
             </v-col>
@@ -78,10 +78,12 @@
           <v-card-actions>
             <v-spacer/>
             <v-btn
+                    class="ma-2"
                     color="warning"
                     @click="updateServer"
             >
               Update server configuration
+              <v-icon right dark>mdi-update</v-icon>
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -100,6 +102,7 @@
                     @click.stop="dialogAddClient = true"
             >
               Add new client
+              <v-icon right dark>mdi-account-multiple-plus-outline</v-icon>
             </v-btn>
           </v-list-item>
           <v-row>
@@ -146,8 +149,8 @@
                           text
                           :href="getUrlToConfig(client.id, false)"
                   >
-                    Download configuration
-                    <v-icon right dark>mdi-cloud-download</v-icon>
+                    Download
+                    <v-icon right dark>mdi-cloud-download-outline</v-icon>
                   </v-btn>
                   <v-btn
                           text
@@ -163,6 +166,13 @@
                     Delete
                     <v-icon right dark>mdi-trash-can-outline</v-icon>
                   </v-btn>
+                  <v-btn
+                          text
+                          @click="sendEmailClient(client.id)"
+                  >
+                    Send email
+                    <v-icon right dark>mdi-email-send-outline</v-icon>
+                  </v-btn>
                   <v-spacer/>
                   <v-tooltip right>
                     <template v-slot:activator="{ on }">
@@ -174,7 +184,7 @@
                               v-on:change="updateClient(client)"
                       />
                     </template>
-                    <span>Enable or disable this client</span>
+                    <span> {{client.enable ? 'Disable' : 'Enable'}} this client</span>
                   </v-tooltip>
 
                 </v-card-actions>
@@ -406,6 +416,14 @@
             this.notify('error', e.response.status + ' ' + e.response.statusText);
           });
         }
+      },
+      sendEmailClient(id) {
+        this.$get(`/client/${id}/email`).then((res) => {
+          this.notify('success', "Email successfully sent");
+          this.getData()
+        }).catch((e) => {
+          this.notify('error', e.response.status + ' ' + e.response.statusText);
+        });
       },
       getUrlToConfig(id, qrcode){
         let base = "/api/v1.0";

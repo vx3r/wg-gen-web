@@ -5,13 +5,16 @@ import (
 	"errors"
 	uuid "github.com/satori/go.uuid"
 	log "github.com/sirupsen/logrus"
+	"github.com/skip2/go-qrcode"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/model"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/util"
 	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
+	"gopkg.in/gomail.v2"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -155,6 +158,82 @@ func DeleteClient(id string) error {
 
 	// data modified, dump new config
 	return generateWgConfig()
+}
+
+// SendEmail to client
+func EmailClient(id string) error {
+	client, err := ReadClient(id)
+	if err != nil {
+		return err
+	}
+
+	configData, err := ReadClientConfig(id)
+	if err != nil {
+		return err
+	}
+
+	// conf as .conf file
+	tmpfileCfg, err := ioutil.TempFile("", "wireguard-vpn-*.conf")
+	if err != nil {
+		return err
+	}
+	if _, err := tmpfileCfg.Write(configData); err != nil {
+		return err
+	}
+	if err := tmpfileCfg.Close(); err != nil {
+		return err
+	}
+	defer os.Remove(tmpfileCfg.Name()) // clean up
+
+	// conf as png image
+	png, err := qrcode.Encode(string(configData), qrcode.Medium, 280)
+	if err != nil {
+		return err
+	}
+	tmpfilePng, err := ioutil.TempFile("", "qrcode-*.png")
+	if err != nil {
+		return err
+	}
+	if _, err := tmpfilePng.Write(png); err != nil {
+		return err
+	}
+	if err := tmpfilePng.Close(); err != nil {
+		return err
+	}
+	defer os.Remove(tmpfilePng.Name()) // clean up
+
+	// get email body
+	emailBody, err := util.DumpEmail(client, filepath.Base(tmpfilePng.Name()))
+	if err != nil {
+		return err
+	}
+
+	// port to int
+	port, err := strconv.Atoi(os.Getenv("SMTP_PORT"))
+	if err != nil {
+		return err
+	}
+
+	d := gomail.NewDialer(os.Getenv("SMTP_HOST"), port, os.Getenv("SMTP_USERNAME"), os.Getenv("SMTP_PASSWORD"))
+	s, err := d.Dial()
+	if err != nil {
+		return err
+	}
+	m := gomail.NewMessage()
+
+	m.SetHeader("From", os.Getenv("SMTP_FROM"))
+	m.SetAddressHeader("To", client.Email, client.Name)
+	m.SetHeader("Subject", "WireGuard VPN Configuration")
+	m.SetBody("text/html", emailBody.String())
+	m.Attach(tmpfileCfg.Name())
+	m.Embed(tmpfilePng.Name())
+
+	err = gomail.Send(s, m)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // ReadClients all clients
