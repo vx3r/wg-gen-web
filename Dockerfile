@@ -1,4 +1,4 @@
-FROM debian:stable-slim
+FROM alpine
 
 WORKDIR /app
 

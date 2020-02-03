@@ -4,9 +4,9 @@ stages:
 
 build-back:
   stage: build
-  image: golang:latest
+  image: golang:alpine
   script:
-    - GOOS=linux GOARCH=amd64 go build -o ${CI_PROJECT_NAME}-linux-amd64
+    - go build -o ${CI_PROJECT_NAME}-linux-amd64
   artifacts:
     paths:
       - ${CI_PROJECT_NAME}-linux-amd64
