@@ -217,6 +217,10 @@ Address = {{.}}
 	{{end}}
 ListenPort = {{.Server.ListenPort}}
 PrivateKey = {{.Server.PrivateKey}}
+PreUp = {{.Server.PreUp}}
+PostUp = {{.Server.PostUp}}
+PreDown = {{.Server.PreDown}}
+PostDown = {{.Server.PostDown}}
 	{{$server := .Server}}
 	{{range .Clients}}
 		{{if .Enable}}

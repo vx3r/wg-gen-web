@@ -55,6 +55,14 @@
                   </v-chip>
                 </template>
               </v-combobox>
+              <v-text-field
+                      v-model="server.preUp"
+                      label="PreUp: script snippets which will be executed by bash before setting up the interface"
+              />
+              <v-text-field
+                      v-model="server.postUp"
+                      label="PostUp: script snippets which will be executed by bash after setting up the interface"
+              />
             </v-col>
             <v-col cols="6">
               <v-text-field
@@ -96,6 +104,14 @@
                   </v-chip>
                 </template>
               </v-combobox>
+              <v-text-field
+                      v-model="server.preDown"
+                      label="PreDown: script snippets which will be executed by bash before setting down the interface"
+              />
+              <v-text-field
+                      v-model="server.postDown "
+                      label="PostDown : script snippets which will be executed by bash after setting down the interface"
+              />
             </v-col>
           </div>
 

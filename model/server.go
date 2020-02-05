@@ -15,4 +15,8 @@ type Server struct {
 	Endpoint            string    `json:"endpoint"`
 	PersistentKeepalive int       `json:"persistentKeepalive"`
 	Dns                 string    `json:"dns"`
+	PreUp               string    `json:"preUp"`
+	PostUp              string    `json:"postUp"`
+	PreDown             string    `json:"preDown"`
+	PostDown            string    `json:"postDown"`
 }

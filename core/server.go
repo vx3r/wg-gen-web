@@ -35,6 +35,10 @@ func ReadServer() (*model.Server, error) {
 		server.Address = "fd9f:6666::10:6:6:1/112, 10.6.6.1/24"
 		server.Dns = "fd9f::10:0:0:2, 10.0.0.2"
 		server.PersistentKeepalive = 16
+		server.PreUp = "echo WireGuard PreUp"
+		server.PostUp = "echo WireGuard PostUp"
+		server.PreDown = "echo WireGuard PreDown"
+		server.PostDown = "echo WireGuard PostDown"
 		server.Created = time.Now().UTC()
 		server.Updated = server.Created
 
