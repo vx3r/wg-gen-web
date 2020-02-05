@@ -4,8 +4,8 @@ import (
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"github.com/skip2/go-qrcode"
+	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/core"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/model"
-	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/repository"
 	"net/http"
 )
 
@@ -41,7 +41,7 @@ func createClient(c *gin.Context) {
 		return
 	}
 
-	client, err := repository.CreateClient(&data)
+	client, err := core.CreateClient(&data)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,
@@ -56,7 +56,7 @@ func createClient(c *gin.Context) {
 func readClient(c *gin.Context) {
 	id := c.Param("id")
 
-	client, err := repository.ReadClient(id)
+	client, err := core.ReadClient(id)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,
@@ -80,7 +80,7 @@ func updateClient(c *gin.Context) {
 		return
 	}
 
-	client, err := repository.UpdateClient(id, &data)
+	client, err := core.UpdateClient(id, &data)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,
@@ -95,7 +95,7 @@ func updateClient(c *gin.Context) {
 func deleteClient(c *gin.Context) {
 	id := c.Param("id")
 
-	err := repository.DeleteClient(id)
+	err := core.DeleteClient(id)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,
@@ -108,7 +108,7 @@ func deleteClient(c *gin.Context) {
 }
 
 func readClients(c *gin.Context) {
-	clients, err := repository.ReadClients()
+	clients, err := core.ReadClients()
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,
@@ -121,7 +121,7 @@ func readClients(c *gin.Context) {
 }
 
 func configClient(c *gin.Context) {
-	configData, err := repository.ReadClientConfig(c.Param("id"))
+	configData, err := core.ReadClientConfig(c.Param("id"))
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,
@@ -153,7 +153,7 @@ func configClient(c *gin.Context) {
 func emailClient(c *gin.Context) {
 	id := c.Param("id")
 
-	err := repository.EmailClient(id)
+	err := core.EmailClient(id)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,
@@ -166,7 +166,7 @@ func emailClient(c *gin.Context) {
 }
 
 func readServer(c *gin.Context) {
-	client, err := repository.ReadServer()
+	client, err := core.ReadServer()
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,
@@ -189,7 +189,7 @@ func updateServer(c *gin.Context) {
 		return
 	}
 
-	client, err := repository.UpdateServer(&data)
+	client, err := core.UpdateServer(&data)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,

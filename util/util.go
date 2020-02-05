@@ -84,6 +84,11 @@ func GetAllAddressesFromCidr(cidr string) ([]string, error) {
 	return ips[2 : len(ips)-1], nil
 }
 
+// IsIPv6 check if given ip is IPv6
+func IsIPv6(address string) bool {
+	return strings.Count(address, ":") >= 2
+}
+
 //  http://play.golang.org/p/m8TNTtygK0
 func inc(ip net.IP) {
 	for j := len(ip) - 1; j >= 0; j-- {
@@ -92,9 +97,4 @@ func inc(ip net.IP) {
 			break
 		}
 	}
-}
-
-// IsIPv6 check if given ip is IPv6
-func IsIPv6(address string) bool {
-	return strings.Count(address, ":") >= 2
 }

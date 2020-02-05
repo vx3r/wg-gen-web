@@ -35,14 +35,26 @@
                         ]"
                       required
               />
-              <v-text-field
+              <v-combobox
                       v-model="server.address"
+                      chips
+                      hint="Write IPv4 or IPv6 CIDR and hit enter"
                       label="Server interface addresses"
-                      :rules="[
-                          v => !!v || 'Server interface address is required',
-                        ]"
-                      required
-              />
+                      multiple
+                      dark
+              >
+                <template v-slot:selection="{ attrs, item, select, selected }">
+                  <v-chip
+                          v-bind="attrs"
+                          :input-value="selected"
+                          close
+                          @click="select"
+                          @click:close="server.address.splice(server.address.indexOf(item), 1)"
+                  >
+                    <strong>{{ item }}</strong>&nbsp;
+                  </v-chip>
+                </template>
+              </v-combobox>
             </v-col>
             <v-col cols="6">
               <v-text-field
@@ -56,14 +68,6 @@
                       disabled
               />
               <v-text-field
-                      v-model="server.dns"
-                      label="DNS servers for clients"
-                      :rules="[
-                          v => !!v || 'DNS server is required',
-                        ]"
-                      required
-              />
-              <v-text-field
                       v-model="server.listenPort"
                       type="number"
                       :rules="[
@@ -72,6 +76,26 @@
                       label="Listen port"
                       required
               />
+              <v-combobox
+                      v-model="server.dns"
+                      chips
+                      hint="Write IPv4 or IPv6 address and hit enter"
+                      label="DNS servers for clients"
+                      multiple
+                      dark
+              >
+                <template v-slot:selection="{ attrs, item, select, selected }">
+                  <v-chip
+                          v-bind="attrs"
+                          :input-value="selected"
+                          close
+                          @click="select"
+                          @click:close="server.dns.splice(server.dns.indexOf(item), 1)"
+                  >
+                    <strong>{{ item }}</strong>&nbsp;
+                  </v-chip>
+                </template>
+              </v-combobox>
             </v-col>
           </div>
 
@@ -99,7 +123,7 @@
             </v-list-item-content>
             <v-btn
                     color="success"
-                    @click.stop="dialogAddClient = true"
+                    @click.stop="startAddClient"
             >
               Add new client
               <v-icon right dark>mdi-account-multiple-plus-outline</v-icon>
@@ -112,7 +136,7 @@
                     cols="6"
             >
               <v-card
-                      color="#1F7087"
+                      :color="client.enable ? '#1F7087' : 'warning'"
                       class="mx-auto"
                       raised
                       shaped
@@ -154,7 +178,7 @@
                   </v-btn>
                   <v-btn
                           text
-                          @click.stop="dialogEditClient = true; clientToEdit = client"
+                          @click.stop="editClient(client.id)"
                   >
                     Edit
                     <v-icon right dark>mdi-square-edit-outline</v-icon>
@@ -181,7 +205,7 @@
                               v-on="on"
                               color="success"
                               v-model="client.enable"
-                              v-on:change="updateClient(client)"
+                              v-on:change="disableClient(client)"
                       />
                     </template>
                     <span> {{client.enable ? 'Disable' : 'Enable'}} this client</span>
@@ -195,6 +219,7 @@
       </v-col>
     </v-row>
     <v-dialog
+            v-if="client"
             v-model="dialogAddClient"
             max-width="550"
     >
@@ -238,6 +263,27 @@
                         persistent-hint
                         required
                 />
+                <v-combobox
+                        v-model="client.allowedIPs"
+                        chips
+                        hint="Write IPv4 or IPv6 CIDR and hit enter"
+                        label="Allowed IPs"
+                        multiple
+                        dark
+                >
+                  <template v-slot:selection="{ attrs, item, select, selected }">
+                    <v-chip
+                            v-bind="attrs"
+                            :input-value="selected"
+                            close
+                            @click="select"
+                            @click:close="client.allowedIPs.splice(client.allowedIPs.indexOf(item), 1)"
+                    >
+                      <strong>{{ item }}</strong>&nbsp;
+                    </v-chip>
+                  </template>
+                </v-combobox>
+
                 <v-switch
                         v-model="client.enable"
                         color="red"
@@ -253,7 +299,7 @@
           <v-btn
                   :disabled="!valid"
                   color="success"
-                  @click="addClient()"
+                  @click="addClient(client)"
           >
             Submit
           </v-btn>
@@ -267,7 +313,7 @@
       </v-card>
     </v-dialog>
     <v-dialog
-            v-if="clientToEdit"
+            v-if="client"
             v-model="dialogEditClient"
             max-width="550"
     >
@@ -283,22 +329,42 @@
                       v-model="valid"
               >
                 <v-text-field
-                        v-model="clientToEdit.name"
-                        label="Client friendly name"
+                        v-model="client.name"
+                        label="Friendly name"
                         :rules="[
                           v => !!v || 'Client name is required',
                         ]"
                         required
                 />
                 <v-text-field
-                        v-model="clientToEdit.email"
-                        label="Client email"
+                        v-model="client.email"
+                        label="Email"
                         :rules="[
-                        v => !!v || 'E-mail is required',
-                        v => /.+@.+\..+/.test(v) || 'E-mail must be valid',
-                      ]"
+                        v => !!v || 'Email is required',
+                        v => /.+@.+\..+/.test(v) || 'Email must be valid',
+                        ]"
                         required
                 />
+                <v-combobox
+                        v-model="client.allowedIPs"
+                        chips
+                        hint="Write IPv4 or IPv6 CIDR and hit enter"
+                        label="Allowed IPs"
+                        multiple
+                        dark
+                >
+                  <template v-slot:selection="{ attrs, item, select, selected }">
+                    <v-chip
+                            v-bind="attrs"
+                            :input-value="selected"
+                            close
+                            @click="select"
+                            @click:close="client.allowedIPs.splice(client.allowedIPs.indexOf(item), 1)"
+                    >
+                      <strong>{{ item }}</strong>&nbsp;
+                    </v-chip>
+                  </template>
+                </v-combobox>
               </v-form>
             </v-col>
           </v-row>
@@ -308,7 +374,7 @@
           <v-btn
                   :disabled="!valid"
                   color="success"
-                  @click="updateClient(clientToEdit)"
+                  @click="updateClient(client)"
           >
             Submit
           </v-btn>
@@ -361,22 +427,40 @@
       serverAddress: [],
       dialogAddClient: false,
       dialogEditClient: false,
-      clientToEdit: null,
-      client: {
-        name: "",
-        email: "",
-        enable: true,
-        allowedIPs: "0.0.0.0/0,::/0",
-        address: "",
-      }
+      client: null,
     }),
-
     methods: {
+      startAddClient() {
+        this.dialogAddClient = true;
+        this.client = {
+          name: "",
+          email: "",
+          enable: true,
+          allowedIPs: ["0.0.0.0/0", "::/0"],
+          address: "",
+        }
+      },
+      editClient(id) {
+        this.$get(`/client/${id}`).then((res) => {
+          this.dialogEditClient = true;
+          res.allowedIPs = res.allowedIPs.split(',');
+          this.client = res
+        }).catch((e) => {
+          this.notify('error', e.response.status + ' ' + e.response.statusText);
+        });
+      },
+      disableClient(client) {
+        client.allowedIPs = client.allowedIPs.split(',');
+        this.updateClient(client)
+      },
       getData() {
         this.$get('/server').then((res) => {
+          res.address = res.address.split(',');
+          res.dns = res.dns.split(',');
           this.server = res;
-          this.clientAddress = this.serverAddress = this.server.address.split(',')
+          this.clientAddress = this.serverAddress = this.server.address
         }).catch((e) => {
+          console.log(e)
           this.notify('error', e.response.status + ' ' + e.response.statusText);
         });
 
@@ -390,6 +474,20 @@
         // convert int values
         this.server.listenPort = parseInt(this.server.listenPort, 10);
         this.server.persistentKeepalive = parseInt(this.server.persistentKeepalive, 10);
+        // check server addresses
+        if (this.server.address.length < 1) {
+          this.notify('error', 'Please provide at least one valid CIDR address for server interface');
+          return;
+        }
+        for (let i = 0; i < this.server.address.length; i++){
+          if (this.$isCidr(this.server.address[i]) === 0) {
+            this.notify('error', 'Invalid CIDR detected, please correct before submitting');
+            return
+          }
+        }
+        this.server.address = this.server.address.join(',');
+        this.server.dns = this.server.dns.join(',');
+
         this.$patch('/server', this.server).then((res) => {
           this.notify('success', "Server successfully updated");
           this.getData()
@@ -397,10 +495,23 @@
           this.notify('error', e.response.status + ' ' + e.response.statusText);
         });
       },
-      addClient () {
+      addClient(client) {
+        if (client.allowedIPs.length < 1) {
+          this.notify('error', 'Please provide at least one valid CIDR address for client allowed IPs');
+          return;
+        }
+        for (let i = 0; i < client.allowedIPs.length; i++){
+          if (this.$isCidr(client.allowedIPs[i]) === 0) {
+            this.notify('error', 'Invalid CIDR detected, please correct before submitting');
+            return
+          }
+        }
+
         this.dialogAddClient = false;
-        this.client.address = this.clientAddress.join(',');
-        this.$post('/client', this.client).then((res) => {
+        client.address = this.clientAddress.join(',');
+        client.allowedIPs = this.client.allowedIPs.join(',');
+
+        this.$post('/client', client).then((res) => {
           this.notify('success', "Client successfully added");
           this.getData()
         }).catch((e) => {
@@ -437,7 +548,20 @@
         }
       },
       updateClient(client) {
+        if (client.allowedIPs.length < 1) {
+          this.notify('error', 'Please provide at least one valid CIDR address for client allowed IPs');
+          return;
+        }
+        for (let i = 0; i < client.allowedIPs.length; i++){
+          if (this.$isCidr(client.allowedIPs[i]) === 0) {
+            this.notify('error', 'Invalid CIDR detected, please correct before submitting');
+            return
+          }
+        }
+
         this.dialogEditClient = false;
+        client.allowedIPs = client.allowedIPs.join(',');
+
         this.$patch(`/client/${client.id}`, client).then((res) => {
           this.notify('success', "Client successfully updated");
           this.getData()

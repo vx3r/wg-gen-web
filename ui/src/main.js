@@ -4,6 +4,7 @@ import router from './router'
 import vuetify from './plugins/vuetify';
 import './plugins/axios';
 import './plugins/moment';
+import './plugins/cidr'
 
 Vue.config.productionTip = false
 

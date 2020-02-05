@@ -30,6 +30,7 @@ The goal is to run Wg Gen Web in a container and WireGuard on host system.
  * Generation of `wg0.conf` after any modification
  * Dockerized
  * Pretty cool look
+
 ![Screenshot](wg-gen-web_screenshot.png)
 
 ## Running

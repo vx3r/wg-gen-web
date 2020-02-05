@@ -1,8 +1,11 @@
-package util
+package template
 
 import (
 	"bytes"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/model"
+	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/util"
+	"os"
+	"path/filepath"
 	"strings"
 	"text/template"
 )
@@ -226,13 +229,11 @@ AllowedIPs = {{.Address}}
 	{{end}}`
 )
 
-// DumpClient dump client wg config with go template
-func DumpClient(client *model.Client, server *model.Server) (bytes.Buffer, error) {
-	var tplBuff bytes.Buffer
-
+// DumpClientWg dump client wg config with go template
+func DumpClientWg(client *model.Client, server *model.Server) ([]byte, error) {
 	t, err := template.New("client").Parse(clientTpl)
 	if err != nil {
-		return tplBuff, err
+		return nil, err
 	}
 
 	return dump(t, struct {
@@ -244,16 +245,14 @@ func DumpClient(client *model.Client, server *model.Server) (bytes.Buffer, error
 	})
 }
 
-// DumpServerWg dump server wg config with go template
-func DumpServerWg(clients []*model.Client, server *model.Server) (bytes.Buffer, error) {
-	var tplBuff bytes.Buffer
-
+// DumpServerWg dump server wg config with go template, write it to file and return bytes
+func DumpServerWg(clients []*model.Client, server *model.Server) ([]byte, error) {
 	t, err := template.New("server").Parse(wgTpl)
 	if err != nil {
-		return tplBuff, err
+		return nil, err
 	}
 
-	return dump(t, struct {
+	configDataWg, err := dump(t, struct {
 		Clients        []*model.Client
 		Server         *model.Server
 		ServerAdresses []string
@@ -262,15 +261,23 @@ func DumpServerWg(clients []*model.Client, server *model.Server) (bytes.Buffer, 
 		Clients:        clients,
 		Server:         server,
 	})
+	if err != nil {
+		return nil, err
+	}
+
+	err = util.WriteFile(filepath.Join(os.Getenv("WG_CONF_DIR"), os.Getenv("WG_INTERFACE_NAME")), configDataWg)
+	if err != nil {
+		return nil, err
+	}
+
+	return configDataWg, nil
 }
 
 // DumpEmail dump server wg config with go template
-func DumpEmail(client *model.Client, qrcodePngName string) (bytes.Buffer, error) {
-	var tplBuff bytes.Buffer
-
+func DumpEmail(client *model.Client, qrcodePngName string) ([]byte, error) {
 	t, err := template.New("email").Parse(emailTpl)
 	if err != nil {
-		return tplBuff, err
+		return nil, err
 	}
 
 	return dump(t, struct {
@@ -282,13 +289,13 @@ func DumpEmail(client *model.Client, qrcodePngName string) (bytes.Buffer, error)
 	})
 }
 
-func dump(tpl *template.Template, data interface{}) (bytes.Buffer, error) {
+func dump(tpl *template.Template, data interface{}) ([]byte, error) {
 	var tplBuff bytes.Buffer
 
 	err := tpl.Execute(&tplBuff, data)
 	if err != nil {
-		return tplBuff, err
+		return nil, err
 	}
 
-	return tplBuff, nil
+	return tplBuff.Bytes(), nil
 }
