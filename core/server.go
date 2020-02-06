@@ -1,6 +1,8 @@
 package core
 
 import (
+	"errors"
+	log "github.com/sirupsen/logrus"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/model"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/storage"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/template"
@@ -8,6 +10,7 @@ import (
 	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -62,6 +65,18 @@ func UpdateServer(server *model.Server) (*model.Server, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	// check if server is valid
+	errs := server.IsValid()
+	if len(errs) != 0 {
+		for _, err := range errs {
+			log.WithFields(log.Fields{
+				"err": err,
+			}).Error("server validation error")
+		}
+		return nil, errors.New("failed to validate server")
+	}
+
 	server.PrivateKey = current.(*model.Server).PrivateKey
 	server.PublicKey = current.(*model.Server).PublicKey
 	server.PresharedKey = current.(*model.Server).PresharedKey
@@ -99,4 +114,47 @@ func UpdateServerConfigWg() error {
 	}
 
 	return nil
+}
+
+// GetAllReservedIps the list of all reserved IPs, client and server
+func GetAllReservedIps() ([]string, error) {
+	clients, err := ReadClients()
+	if err != nil {
+		return nil, err
+	}
+
+	server, err := ReadServer()
+	if err != nil {
+		return nil, err
+	}
+
+	reserverIps := make([]string, 0)
+
+	for _, client := range clients {
+		for _, cidr := range strings.Split(client.Address, ",") {
+			ip, err := util.GetIpFromCidr(strings.TrimSpace(cidr))
+			if err != nil {
+				log.WithFields(log.Fields{
+					"err":  err,
+					"cidr": err,
+				}).Error("failed to ip from cidr")
+			} else {
+				reserverIps = append(reserverIps, ip)
+			}
+		}
+	}
+
+	for _, cidr := range strings.Split(server.Address, ",") {
+		ip, err := util.GetIpFromCidr(strings.TrimSpace(cidr))
+		if err != nil {
+			log.WithFields(log.Fields{
+				"err":  err,
+				"cidr": err,
+			}).Error("failed to ip from cidr")
+		} else {
+			reserverIps = append(reserverIps, ip)
+		}
+	}
+
+	return reserverIps, nil
 }

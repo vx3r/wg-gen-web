@@ -22,6 +22,17 @@ import (
 
 // CreateClient client with all necessary data
 func CreateClient(client *model.Client) (*model.Client, error) {
+	// check if client is valid
+	errs := client.IsValid()
+	if len(errs) != 0 {
+		for _, err := range errs {
+			log.WithFields(log.Fields{
+				"err": err,
+			}).Error("client validation error")
+		}
+		return nil, errors.New("failed to validate client")
+	}
+
 	u := uuid.NewV4()
 	client.Id = u.String()
 
@@ -32,32 +43,14 @@ func CreateClient(client *model.Client) (*model.Client, error) {
 	client.PrivateKey = key.String()
 	client.PublicKey = key.PublicKey().String()
 
-	// find available IP address from selected networks
-	clients, err := ReadClients()
+	reserverIps, err := GetAllReservedIps()
 	if err != nil {
 		return nil, err
 	}
 
-	reserverIps := make([]string, 0)
-	for _, client := range clients {
-		ips := strings.Split(client.Address, ",")
-		for i := range ips {
-			if util.IsIPv6(ips[i]) {
-				ips[i] = strings.ReplaceAll(strings.TrimSpace(ips[i]), "/128", "")
-			} else {
-				ips[i] = strings.ReplaceAll(strings.TrimSpace(ips[i]), "/32", "")
-			}
-		}
-		reserverIps = append(reserverIps, ips...)
-	}
-
-	networks := strings.Split(client.Address, ",")
-	for i := range networks {
-		networks[i] = strings.TrimSpace(networks[i])
-	}
 	ips := make([]string, 0)
-	for _, network := range networks {
-		ip, err := util.GetAvailableIp(network, reserverIps)
+	for _, network := range strings.Split(client.Address, ",") {
+		ip, err := util.GetAvailableIp(strings.TrimSpace(network), reserverIps)
 		if err != nil {
 			return nil, err
 		}
@@ -109,6 +102,18 @@ func UpdateClient(Id string, client *model.Client) (*model.Client, error) {
 	if current.Id != client.Id {
 		return nil, errors.New("records Id mismatch")
 	}
+
+	// check if client is valid
+	errs := client.IsValid()
+	if len(errs) != 0 {
+		for _, err := range errs {
+			log.WithFields(log.Fields{
+				"err": err,
+			}).Error("client validation error")
+		}
+		return nil, errors.New("failed to validate client")
+	}
+
 	// keep keys
 	client.PrivateKey = current.PrivateKey
 	client.PublicKey = current.PublicKey
@@ -159,7 +164,7 @@ func ReadClients() ([]*model.Client, error) {
 				log.WithFields(log.Fields{
 					"err":  err,
 					"path": f.Name(),
-				}).Error("failed to storage.Destorage.Serialize client")
+				}).Error("failed to deserialize client")
 			} else {
 				clients = append(clients, c.(*model.Client))
 			}

@@ -318,12 +318,14 @@
                   @click="addClient(client)"
           >
             Submit
+            <v-icon right dark>mdi-check-outline</v-icon>
           </v-btn>
           <v-btn
                   color="primary"
                   @click="dialogAddClient = false"
           >
             Cancel
+            <v-icon right dark>mdi-close-circle-outline</v-icon>
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -362,6 +364,26 @@
                         required
                 />
                 <v-combobox
+                        v-model="client.address"
+                        chips
+                        hint="Write IPv4 or IPv6 CIDR and hit enter"
+                        label="Addresses"
+                        multiple
+                        dark
+                >
+                  <template v-slot:selection="{ attrs, item, select, selected }">
+                    <v-chip
+                            v-bind="attrs"
+                            :input-value="selected"
+                            close
+                            @click="select"
+                            @click:close="client.address.splice(client.address.indexOf(item), 1)"
+                    >
+                      <strong>{{ item }}</strong>&nbsp;
+                    </v-chip>
+                  </template>
+                </v-combobox>
+                <v-combobox
                         v-model="client.allowedIPs"
                         chips
                         hint="Write IPv4 or IPv6 CIDR and hit enter"
@@ -393,12 +415,14 @@
                   @click="updateClient(client)"
           >
             Submit
+            <v-icon right dark>mdi-check-outline</v-icon>
           </v-btn>
           <v-btn
                   color="primary"
                   @click="dialogEditClient = false"
           >
             Cancel
+            <v-icon right dark>mdi-close-circle-outline</v-icon>
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -460,13 +484,19 @@
         this.$get(`/client/${id}`).then((res) => {
           this.dialogEditClient = true;
           res.allowedIPs = res.allowedIPs.split(',');
+          res.address = res.address.split(',');
           this.client = res
         }).catch((e) => {
           this.notify('error', e.response.status + ' ' + e.response.statusText);
         });
       },
       disableClient(client) {
-        client.allowedIPs = client.allowedIPs.split(',');
+        if(!Array.isArray(client.allowedIPs)){
+          client.allowedIPs = client.allowedIPs.split(',');
+        }
+        if(!Array.isArray(client.address)){
+          client.address = client.address.split(',');
+        }
         this.updateClient(client)
       },
       getData() {
@@ -476,7 +506,6 @@
           this.server = res;
           this.clientAddress = this.serverAddress = this.server.address
         }).catch((e) => {
-          console.log(e)
           this.notify('error', e.response.status + ' ' + e.response.statusText);
         });
 
@@ -564,6 +593,7 @@
         }
       },
       updateClient(client) {
+        // check allowed IPs
         if (client.allowedIPs.length < 1) {
           this.notify('error', 'Please provide at least one valid CIDR address for client allowed IPs');
           return;
@@ -574,9 +604,21 @@
             return
           }
         }
-
+        // check address
+        if (client.address.length < 1) {
+          this.notify('error', 'Please provide at least one valid CIDR address for client');
+          return;
+        }
+        for (let i = 0; i < client.address.length; i++){
+          if (this.$isCidr(client.address[i]) === 0) {
+            this.notify('error', 'Invalid CIDR detected, please correct before submitting');
+            return
+          }
+        }
+        // all good, submit
         this.dialogEditClient = false;
         client.allowedIPs = client.allowedIPs.join(',');
+        client.address = client.address.join(',');
 
         this.$patch(`/client/${client.id}`, client).then((res) => {
           this.notify('success', "Client successfully updated");

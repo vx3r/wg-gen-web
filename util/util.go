@@ -5,7 +5,11 @@ import (
 	"io/ioutil"
 	"net"
 	"os"
-	"strings"
+	"regexp"
+)
+
+var (
+	RegexpEmail = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
 )
 
 // ReadFile file content
@@ -86,7 +90,31 @@ func GetAllAddressesFromCidr(cidr string) ([]string, error) {
 
 // IsIPv6 check if given ip is IPv6
 func IsIPv6(address string) bool {
-	return strings.Count(address, ":") >= 2
+	ip := net.ParseIP(address)
+	if ip == nil {
+		return false
+	}
+	return ip.To4() == nil
+}
+
+// IsValidIp check if ip is valid
+func IsValidIp(ip string) bool {
+	return net.ParseIP(ip) != nil
+}
+
+// IsValidCidr check if CIDR is valid
+func IsValidCidr(cidr string) bool {
+	_, _, err := net.ParseCIDR(cidr)
+	return err == nil
+}
+
+// GetIpFromCidr get ip from cidr
+func GetIpFromCidr(cidr string) (string, error) {
+	ip, _, err := net.ParseCIDR(cidr)
+	if err != nil {
+		return "", err
+	}
+	return ip.String(), nil
 }
 
 //  http://play.golang.org/p/m8TNTtygK0

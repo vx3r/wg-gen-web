@@ -3,7 +3,7 @@ WORKDIR /app
 ADD . .
 RUN go build -o wg-gen-web-linux
 
-FROM node:10-alpine as build-front
+FROM node:10-alpine AS build-front
 WORKDIR /app
 ADD ui .
 RUN npm install
