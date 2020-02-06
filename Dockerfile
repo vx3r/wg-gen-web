@@ -1,19 +1,21 @@
 FROM golang:alpine AS build-back
 WORKDIR /app
-ADD . .
+COPY . .
 RUN go build -o wg-gen-web-linux
 
 FROM node:10-alpine AS build-front
 WORKDIR /app
-ADD ui .
+COPY ui/package*.json ./
 RUN npm install
+COPY ui/ ./
+RUN ls -l
 RUN npm run build
 
 FROM alpine
 WORKDIR /app
 COPY --from=build-back /app/wg-gen-web-linux .
 COPY --from=build-front /app/dist ./ui/dist
-ADD .env .
+COPY .env .
 RUN chmod +x ./wg-gen-web-linux
 RUN apk add --no-cache ca-certificates
 EXPOSE 8080

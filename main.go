@@ -41,7 +41,7 @@ func main() {
 	}
 
 	if os.Getenv("GIN_MODE") == "debug" {
-		// set gin release mode
+		// set gin release debug
 		gin.SetMode(gin.DebugMode)
 	} else {
 		// set gin release mode
