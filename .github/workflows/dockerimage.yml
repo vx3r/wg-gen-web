@@ -1,0 +1,41 @@
+name: Build multi-arch Docker Images via buildx
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+
+jobs:
+  docker-buildx:
+    runs-on: ubuntu-latest
+    env:
+      DOCKER_IMAGE_NAME: vx3r/wg-gen-web
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v1
+      -
+        name: Build Docker Images Only
+        if: github.event_name == 'pull_request'
+        uses: ilteoood/docker_buildx@master
+        with:
+          publish: false
+          tag: dev
+          dockerFile: ./Dockerfile
+          platform: linux/amd64,linux/arm64,linux/arm/v7
+          imageName: ${{ env.DOCKER_IMAGE_NAME }}
+      -
+        name: Build and Publish Docker Images
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        uses: ilteoood/docker_buildx@master
+        with:
+          publish: true
+          tag: latest
+          dockerFile: ./Dockerfile
+          platform: linux/amd64,linux/arm64,linux/arm/v7
+          imageName: ${{ env.DOCKER_IMAGE_NAME }}
+          dockerHubUser: ${{ secrets.DOCKER_LOGIN_USERNAME }}
+          dockerHubPassword: ${{ secrets.DOCKER_LOGIN_PASSWORD }}
