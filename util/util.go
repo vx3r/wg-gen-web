@@ -52,40 +52,30 @@ func DirectoryExists(name string) bool {
 
 // GetAvailableIp search for an available in cidr against a list of reserved ips
 func GetAvailableIp(cidr string, reserved []string) (string, error) {
-	addresses, err := GetAllAddressesFromCidr(cidr)
+	ip, ipnet, err := net.ParseCIDR(cidr)
 	if err != nil {
 		return "", err
 	}
 
-	for _, addresse := range addresses {
+	// this two addresses are not usable
+	broadcastAddr := BroadcastAddr(ipnet).String()
+	networkAddr := ipnet.IP.String()
+
+	for ip := ip.Mask(ipnet.Mask); ipnet.Contains(ip); inc(ip) {
 		ok := true
+		address := ip.String()
 		for _, r := range reserved {
-			if addresse == r {
+			if address == r {
 				ok = false
 				break
 			}
 		}
-		if ok {
-			return addresse, nil
+		if ok && address != networkAddr && address != broadcastAddr {
+			return address, nil
 		}
 	}
 
 	return "", errors.New("no more available address from cidr")
-}
-
-// GetAllAddressesFromCidr get all ip addresses from cidr
-func GetAllAddressesFromCidr(cidr string) ([]string, error) {
-	ip, ipnet, err := net.ParseCIDR(cidr)
-	if err != nil {
-		return nil, err
-	}
-
-	var ips []string
-	for ip := ip.Mask(ipnet.Mask); ipnet.Contains(ip); inc(ip) {
-		ips = append(ips, ip.String())
-	}
-	// remove network address and broadcast address (and server ip .1)
-	return ips[2 : len(ips)-1], nil
 }
 
 // IsIPv6 check if given ip is IPv6
@@ -125,4 +115,19 @@ func inc(ip net.IP) {
 			break
 		}
 	}
+}
+
+// BroadcastAddr returns the last address in the given network, or the broadcast address.
+func BroadcastAddr(n *net.IPNet) net.IP {
+	// The golang net package doesn't make it easy to calculate the broadcast address. :(
+	var broadcast net.IP
+	if len(n.IP) == 4 {
+		broadcast = net.ParseIP("0.0.0.0").To4()
+	} else {
+		broadcast = net.ParseIP("::")
+	}
+	for i := 0; i < len(n.IP); i++ {
+		broadcast[i] = n.IP[i] | ^n.Mask[i]
+	}
+	return broadcast
 }
