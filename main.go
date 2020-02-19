@@ -41,14 +41,6 @@ func main() {
 		}
 	}
 
-	// check server.json or create it
-	_, err = core.ReadServer()
-	if err != nil {
-		log.WithFields(log.Fields{
-			"err": err,
-		}).Fatal("failed to ensure server.json exists")
-	}
-
 	if os.Getenv("GIN_MODE") == "debug" {
 		// set gin release debug
 		gin.SetMode(gin.DebugMode)
