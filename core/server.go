@@ -10,7 +10,6 @@ import (
 	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
 	"os"
 	"path/filepath"
-	"strings"
 	"time"
 )
 
@@ -32,12 +31,19 @@ func ReadServer() (*model.Server, error) {
 		}
 		server.PresharedKey = presharedKey.String()
 
-		server.Name = "Created with default values"
 		server.Endpoint = "wireguard.example.com:123"
 		server.ListenPort = 51820
-		server.Address = "fd9f:6666::10:6:6:1/112, 10.6.6.1/24"
-		server.Dns = "fd9f::10:0:0:2, 10.0.0.2"
+
+		server.Address = make([]string, 0)
+		server.Address = append(server.Address, "fd9f:6666::10:6:6:1/64")
+		server.Address = append(server.Address, "10.6.6.1/24")
+
+		server.Dns = make([]string, 0)
+		server.Dns = append(server.Dns, "fd9f::10:0:0:2")
+		server.Dns = append(server.Dns, "10.0.0.2")
+
 		server.PersistentKeepalive = 16
+		server.Mtu = 0
 		server.PreUp = "echo WireGuard PreUp"
 		server.PostUp = "echo WireGuard PostUp"
 		server.PreDown = "echo WireGuard PreDown"
@@ -131,12 +137,12 @@ func GetAllReservedIps() ([]string, error) {
 	reserverIps := make([]string, 0)
 
 	for _, client := range clients {
-		for _, cidr := range strings.Split(client.Address, ",") {
-			ip, err := util.GetIpFromCidr(strings.TrimSpace(cidr))
+		for _, cidr := range client.Address {
+			ip, err := util.GetIpFromCidr(cidr)
 			if err != nil {
 				log.WithFields(log.Fields{
 					"err":  err,
-					"cidr": err,
+					"cidr": cidr,
 				}).Error("failed to ip from cidr")
 			} else {
 				reserverIps = append(reserverIps, ip)
@@ -144,8 +150,8 @@ func GetAllReservedIps() ([]string, error) {
 		}
 	}
 
-	for _, cidr := range strings.Split(server.Address, ",") {
-		ip, err := util.GetIpFromCidr(strings.TrimSpace(cidr))
+	for _, cidr := range server.Address {
+		ip, err := util.GetIpFromCidr(cidr)
 		if err != nil {
 			log.WithFields(log.Fields{
 				"err":  err,

@@ -1,6 +1,28 @@
 stages:
+  - build artifacts
   - build docker image
   - push docker hub
+
+build-back:
+  stage: build artifacts
+  image: golang:latest
+  script:
+    - GOOS=linux GOARCH=amd64 go build -o ${CI_PROJECT_NAME}-linux-amd64
+  artifacts:
+    paths:
+      - ${CI_PROJECT_NAME}-linux-amd64
+
+build-front:
+  stage: build artifacts
+  image: node:10-alpine
+  script:
+    - cd ./ui
+    - npm install
+    - npm run build
+    - cd ..
+  artifacts:
+    paths:
+      - ui/dist
 
 build:
   stage: build docker image

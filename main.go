@@ -9,6 +9,7 @@ import (
 	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/api"
+	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/core"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/util"
 	"os"
 	"path/filepath"
@@ -40,6 +41,14 @@ func main() {
 		}
 	}
 
+	// check server.json or create it
+	_, err = core.ReadServer()
+	if err != nil {
+		log.WithFields(log.Fields{
+			"err": err,
+		}).Fatal("failed to ensure server.json exists")
+	}
+
 	if os.Getenv("GIN_MODE") == "debug" {
 		// set gin release debug
 		gin.SetMode(gin.DebugMode)
@@ -48,6 +57,14 @@ func main() {
 		gin.SetMode(gin.ReleaseMode)
 		// disable console color
 		gin.DisableConsoleColor()
+	}
+
+	// migrate
+	err = core.Migrate()
+	if err != nil {
+		log.WithFields(log.Fields{
+			"err": err,
+		}).Fatal("failed to migrate")
 	}
 
 	// creates a gin router with default middleware: logger and recovery (crash-free) middleware

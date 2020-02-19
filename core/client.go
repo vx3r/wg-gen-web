@@ -16,7 +16,6 @@ import (
 	"path/filepath"
 	"sort"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -49,8 +48,8 @@ func CreateClient(client *model.Client) (*model.Client, error) {
 	}
 
 	ips := make([]string, 0)
-	for _, network := range strings.Split(client.Address, ",") {
-		ip, err := util.GetAvailableIp(strings.TrimSpace(network), reserverIps)
+	for _, network := range client.Address {
+		ip, err := util.GetAvailableIp(network, reserverIps)
 		if err != nil {
 			return nil, err
 		}
@@ -61,7 +60,7 @@ func CreateClient(client *model.Client) (*model.Client, error) {
 		}
 		ips = append(ips, ip)
 	}
-	client.Address = strings.Join(ips, ",")
+	client.Address = ips
 	client.Created = time.Now().UTC()
 	client.Updated = client.Created
 

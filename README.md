@@ -27,6 +27,7 @@ The goal is to run Wg Gen Web in a container and WireGuard on host system.
  * Self-hosted and web based
  * Automatically select IP from the netowrk pool assigned to client
  * QR-Code for convenient mobile client configuration
+ * Sent email to client with QR-code and client config
  * Enable / Disable client
  * Generation of `wg0.conf` after any modification
  * Dockerized

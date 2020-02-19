@@ -12,7 +12,6 @@
     "moment": "^2.24.0",
     "vue": "^2.6.10",
     "vue-moment": "^4.1.0",
-    "vue-plugin-axios": "^1.0.14",
     "vue-router": "^3.1.3",
     "vuetify": "^2.1.0"
   },

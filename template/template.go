@@ -197,45 +197,54 @@ var (
 </html>
 `
 
-	clientTpl = `
-[Interface]
-Address = {{.Client.Address}}
-PrivateKey = {{.Client.PrivateKey}}
-DNS = {{.Server.Dns}}
+	clientTpl = `[Interface]
+Address = {{ StringsJoin .Client.Address ", " }}
+PrivateKey = {{ .Client.PrivateKey }}
+{{ if ne (len .Server.Dns) 0 -}}
+DNS = {{ StringsJoin .Server.Dns ", " }}
+{{- end }}
+{{ if ne .Server.Mtu 0 -}}
+MTU = {{.Server.Mtu}}
+{{- end}}
 [Peer]
-PublicKey = {{.Server.PublicKey}}
-PresharedKey = {{.Server.PresharedKey}}
-AllowedIPs = {{.Client.AllowedIPs}}
-Endpoint = {{.Server.Endpoint}}
-PersistentKeepalive = {{.Server.PersistentKeepalive}}`
+PublicKey = {{ .Server.PublicKey }}
+PresharedKey = {{ .Server.PresharedKey }}
+AllowedIPs = {{ StringsJoin .Client.AllowedIPs ", " }}
+Endpoint = {{ .Server.Endpoint }}
+{{ if ne .Server.PersistentKeepalive 0 -}}
+PersistentKeepalive = {{.Server.PersistentKeepalive}}
+{{- end}}
+`
 
-	wgTpl = `
-# {{.Server.Name}} / Updated: {{.Server.Updated}} / Created: {{.Server.Created}}
+	wgTpl = `# Updated: {{ .Server.Updated }} / Created: {{ .Server.Created }}
 [Interface]
-	{{range .ServerAdresses}}
-Address = {{.}}
-	{{end}}
-ListenPort = {{.Server.ListenPort}}
-PrivateKey = {{.Server.PrivateKey}}
-PreUp = {{.Server.PreUp}}
-PostUp = {{.Server.PostUp}}
-PreDown = {{.Server.PreDown}}
-PostDown = {{.Server.PostDown}}
-	{{$server := .Server}}
-	{{range .Clients}}
-		{{if .Enable}}
+{{- range .Server.Address }}
+Address = {{ . }}
+{{- end }}
+ListenPort = {{ .Server.ListenPort }}
+PrivateKey = {{ .Server.PrivateKey }}
+{{ if ne .Server.Mtu 0 -}}
+MTU = {{.Server.Mtu}}
+{{- end}}
+PreUp = {{ .Server.PreUp }}
+PostUp = {{ .Server.PostUp }}
+PreDown = {{ .Server.PreDown }}
+PostDown = {{ .Server.PostDown }}
+{{ $server := .Server }}
+{{- range .Clients }}
+{{ if .Enable -}}
 # {{.Name}} / {{.Email}} / Updated: {{.Updated}} / Created: {{.Created}}
 [Peer]
-PublicKey = {{.PublicKey}}
-PresharedKey = {{$server.PresharedKey}}
-AllowedIPs = {{.Address}}
-		{{end}}
-	{{end}}`
+PublicKey = {{ .PublicKey }}
+PresharedKey = {{ $server.PresharedKey }}
+AllowedIPs = {{ StringsJoin .Address ", " }}
+{{- end }}
+{{ end }}`
 )
 
 // DumpClientWg dump client wg config with go template
 func DumpClientWg(client *model.Client, server *model.Server) ([]byte, error) {
-	t, err := template.New("client").Parse(clientTpl)
+	t, err := template.New("client").Funcs(template.FuncMap{"StringsJoin": strings.Join}).Parse(clientTpl)
 	if err != nil {
 		return nil, err
 	}
@@ -251,19 +260,17 @@ func DumpClientWg(client *model.Client, server *model.Server) ([]byte, error) {
 
 // DumpServerWg dump server wg config with go template, write it to file and return bytes
 func DumpServerWg(clients []*model.Client, server *model.Server) ([]byte, error) {
-	t, err := template.New("server").Parse(wgTpl)
+	t, err := template.New("server").Funcs(template.FuncMap{"StringsJoin": strings.Join}).Parse(wgTpl)
 	if err != nil {
 		return nil, err
 	}
 
 	configDataWg, err := dump(t, struct {
-		Clients        []*model.Client
-		Server         *model.Server
-		ServerAdresses []string
+		Clients []*model.Client
+		Server  *model.Server
 	}{
-		ServerAdresses: strings.Split(server.Address, ","),
-		Clients:        clients,
-		Server:         server,
+		Clients: clients,
+		Server:  server,
 	})
 	if err != nil {
 		return nil, err
