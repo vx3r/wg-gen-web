@@ -41,6 +41,16 @@ func main() {
 		}
 	}
 
+	// check if server.json exists otherwise create it
+	if !util.FileExists(filepath.Join(os.Getenv("WG_CONF_DIR"), "server.json")) {
+		_, err = core.ReadServer()
+		if err != nil {
+			log.WithFields(log.Fields{
+				"err": err,
+			}).Fatal("server.json doesnt not exists and can not read it")
+		}
+	}
+
 	if os.Getenv("GIN_MODE") == "debug" {
 		// set gin release debug
 		gin.SetMode(gin.DebugMode)
