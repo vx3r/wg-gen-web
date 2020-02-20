@@ -1,12 +1,20 @@
 <template>
     <v-container v-if="server">
         <v-row>
-            <v-col cols="6">
+            <v-col cols="12">
                 <v-card dark>
                     <v-list-item>
                         <v-list-item-content>
                             <v-list-item-title class="headline">Server's interface configuration</v-list-item-title>
                         </v-list-item-content>
+                        <v-btn
+                                class="ma-2"
+                                color="warning"
+                                @click="updateServer"
+                        >
+                            Update server configuration
+                            <v-icon right dark>mdi-update</v-icon>
+                        </v-btn>
                     </v-list-item>
                     <div class="d-flex flex-no-wrap justify-space-between">
                         <v-col cols="12">
@@ -53,12 +61,20 @@
                     </div>
                 </v-card>
             </v-col>
-            <v-col cols="6">
+            <v-col cols="12">
                 <v-card dark>
                     <v-list-item>
                         <v-list-item-content>
                             <v-list-item-title class="headline">Client's global configuration</v-list-item-title>
                         </v-list-item-content>
+                        <v-btn
+                                class="ma-2"
+                                color="warning"
+                                @click="updateServer"
+                        >
+                            Update server configuration
+                            <v-icon right dark>mdi-update</v-icon>
+                        </v-btn>
                     </v-list-item>
                     <div class="d-flex flex-no-wrap justify-space-between">
                         <v-col cols="12">
@@ -114,6 +130,14 @@
                         <v-list-item-content>
                             <v-list-item-title class="headline">Interface configuration hooks</v-list-item-title>
                         </v-list-item-content>
+                        <v-btn
+                                class="ma-2"
+                                color="warning"
+                                @click="updateServer"
+                        >
+                            Update server configuration
+                            <v-icon right dark>mdi-update</v-icon>
+                        </v-btn>
                     </v-list-item>
                     <div class="d-flex flex-no-wrap justify-space-between">
                         <v-col cols="12">
@@ -140,16 +164,6 @@
         </v-row>
         <v-divider dark/>
         <v-divider dark/>
-        <v-row justify="center">
-            <v-btn
-                    class="ma-2"
-                    color="warning"
-                    @click="updateServer"
-            >
-                Update server configuration
-                <v-icon right dark>mdi-update</v-icon>
-            </v-btn>
-        </v-row>
         <Notification v-bind:notification="notification"/>
     </v-container>
 </template>

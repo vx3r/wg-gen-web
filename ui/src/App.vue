@@ -3,7 +3,21 @@
 
     <v-app-bar app>
       <img class="mr-3" :src="require('./assets/logo.png')" height="50" alt="Wg Gen Web"/>
-      <v-toolbar-title>Wg Gen Web</v-toolbar-title>
+      <v-toolbar-title to="/">Wg Gen Web</v-toolbar-title>
+
+      <v-spacer />
+
+      <v-toolbar-items>
+        <v-btn to="/clients">
+          Clients
+          <v-icon right dark>mdi-account-network-outline</v-icon>
+        </v-btn>
+        <v-btn to="/server">
+          Server
+          <v-icon right dark>mdi-vpn</v-icon>
+        </v-btn>
+      </v-toolbar-items>
+
     </v-app-bar>
 
     <v-content>
