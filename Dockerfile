@@ -1,16 +1,16 @@
+ARG COMMIT="N/A"
+
 FROM golang:alpine AS build-back
 WORKDIR /app
-RUN apk update && apk upgrade && apk add --no-cache git
+ARG COMMIT
 COPY . .
-RUN GIT_COMMIT=$(git rev-parse --short HEAD) && go build -ldflags "-X main.VersionGitCommit=$GIT_COMMIT" go build -o wg-gen-web-linux
+RUN go build -ldflags="-X 'gitlab.127-0-0-1.fr/vx3r/wg-gen-web/util.Version=${COMMIT}'" -o wg-gen-web-linux
 
 FROM node:10-alpine AS build-front
 WORKDIR /app
-RUN apk update && apk upgrade && apk add --no-cache git
 COPY ui/package*.json ./
 RUN npm install
 COPY ui/ ./
-COPY .git .
 RUN npm run build
 
 FROM alpine

@@ -39,3 +39,4 @@ jobs:
           imageName: ${{ env.DOCKER_IMAGE_NAME }}
           dockerHubUser: ${{ secrets.DOCKER_LOGIN_USERNAME }}
           dockerHubPassword: ${{ secrets.DOCKER_LOGIN_PASSWORD }}
+          buildArg: COMMIT=${{ GITHUB_SHA::8 }}

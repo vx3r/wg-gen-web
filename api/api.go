@@ -6,6 +6,7 @@ import (
 	"github.com/skip2/go-qrcode"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/core"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/model"
+	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/util"
 	"net/http"
 )
 
@@ -27,6 +28,7 @@ func ApplyRoutes(r *gin.Engine) {
 	{
 		server.GET("", readServer)
 		server.PATCH("", updateServer)
+		server.GET("/version", version)
 	}
 }
 
@@ -199,4 +201,10 @@ func updateServer(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, client)
+}
+
+func version(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"version": util.Version,
+	})
 }

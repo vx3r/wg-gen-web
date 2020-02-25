@@ -24,29 +24,59 @@
       <v-container>
         <router-view />
       </v-container>
+      <Notification v-bind:notification="notification"/>
     </v-content>
 
     <v-footer app>
-      <span>License <a class="pr-1 pl-1" href="http://www.wtfpl.net/" target="_blank">WTFPL</a> &copy; {{ new Date().getFullYear() }} Created with</span><v-icon class="pr-1 pl-1">mdi-heart</v-icon><span>by</span><a class="pr-1 pl-1" href="mailto:vx3r@127-0-0-1.fr">vx3r</a><v-spacer></v-spacer><span>Version: {{ VersionGitCommit }}</span>
+      <span>License <a class="pr-1 pl-1" href="http://www.wtfpl.net/" target="_blank">WTFPL</a> &copy; {{ new Date().getFullYear() }} Created with</span><v-icon class="pr-1 pl-1">mdi-heart</v-icon><span>by</span><a class="pr-1 pl-1" href="mailto:vx3r@127-0-0-1.fr">vx3r</a><v-spacer></v-spacer><span>Version: {{ version }}</span>
     </v-footer>
 
   </v-app>
 </template>
 
 <script>
-export default {
-  name: 'App',
+  import {ApiService} from "./services/ApiService";
+  import Notification from './components/Notification'
 
-  data: () => ({
-    VersionGitCommit: process.env.VUE_APP_GIT_HASH
-  }),
+  export default {
+    name: 'App',
 
-  mounted() {
-    console.log("Starting Wg Gen Web version: " + process.env.VUE_APP_GIT_HASH)
-  },
+    components: {
+      Notification
+    },
 
-  created () {
-    this.$vuetify.theme.dark = true
-  },
-};
+    data: () => ({
+      api: null,
+      version:'N/A',
+      notification: {
+        show: false,
+        color: '',
+        text: '',
+      },
+    }),
+
+    mounted() {
+      this.api = new ApiService();
+      this.getVersion()
+    },
+
+    created () {
+      this.$vuetify.theme.dark = true
+    },
+
+    methods: {
+      getVersion() {
+        this.api.get('/server/version').then((res) => {
+          this.version = res.version;
+        }).catch((e) => {
+          this.notify('error', e.response.status + ' ' + e.response.statusText);
+        });
+      },
+      notify(color, msg) {
+        this.notification.show = true;
+        this.notification.color = color;
+        this.notification.text = msg;
+      }
+    }
+  };
 </script>
