@@ -8,6 +8,7 @@ Simple Web based configuration generator for [WireGuard](https://wireguard.com).
 [![Go Report Card](https://goreportcard.com/badge/github.com/vx3r/wg-gen-web)](https://goreportcard.com/report/github.com/vx3r/wg-gen-web)
 ![Gitlab pipeline status (self-hosted)](https://img.shields.io/gitlab/pipeline/vx3r/wg-gen-web?gitlab_url=https%3A%2F%2Fgitlab.127-0-0-1.fr%2F)
 [![License: WTFPL](https://img.shields.io/badge/License-WTFPL-brightgreen.svg)](http://www.wtfpl.net/about/)
+![Discord](https://img.shields.io/discord/681699554189377567)
 ![Build multi-arch Docker Images via buildx](https://github.com/vx3r/wg-gen-web/workflows/Build%20multi-arch%20Docker%20Images%20via%20buildx/badge.svg)
 ![GitHub last commit](https://img.shields.io/github/last-commit/vx3r/wg-gen-web)
 ![Docker Pulls](https://img.shields.io/docker/pulls/vx3r/wg-gen-web)
@@ -60,7 +61,7 @@ services:
       - SMTP_PORT=587
       - SMTP_USERNAME=account@gmail.com
       - SMTP_PASSWORD="*************"
-      - SMTP_FROM="Wg Gen Web <account@gmail.com>"
+      - SMTP_FROM=Wg Gen Web <account@gmail.com>
     volumes:
       - /etc/wireguard:/data
 ```
@@ -133,6 +134,18 @@ Feel free to modify this file in order to use your existing keys
 
  * Multi-user support behind [Authelia](https://github.com/authelia/authelia) (suggestions / thoughts are welcome)
  * ~~Send configs by email to client~~
+
+## Need Help
+
+ * Join us on [Discord](https://discord.gg/fjx7gGJ)
+ * Create an issue
+
+## Application stack
+
+ * [Gin, HTTP web framework written in Go](https://github.com/gin-gonic/gin)
+ * [go-template, data-driven templates for generating textual output](https://golang.org/pkg/text/template/)
+ * [Vue.js, progressive javaScript framework](https://github.com/vuejs/vue)
+ * [Vuetify, material design component framework](https://github.com/vuetifyjs/vuetify)
 
 ## License
 
