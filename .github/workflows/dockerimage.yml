@@ -18,6 +18,10 @@ jobs:
         name: Checkout
         uses: actions/checkout@v1
       -
+        name: Set sha_short
+        id: vars
+        run: echo ::set-output name=sha_short::$(git rev-parse --short HEAD)
+      -
         name: Build Docker Images Only
         if: github.event_name == 'pull_request'
         uses: ilteoood/docker_buildx@master
@@ -39,4 +43,4 @@ jobs:
           imageName: ${{ env.DOCKER_IMAGE_NAME }}
           dockerHubUser: ${{ secrets.DOCKER_LOGIN_USERNAME }}
           dockerHubPassword: ${{ secrets.DOCKER_LOGIN_PASSWORD }}
-          buildArg: COMMIT=${GITHUB_SHA::8}
+          buildArg: COMMIT=${{ steps.vars.outputs.sha_short }}
