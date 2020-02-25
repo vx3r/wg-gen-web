@@ -8,16 +8,17 @@ import (
 
 // Client structure
 type Client struct {
-	Id         string    `json:"id"`
-	Name       string    `json:"name"`
-	Email      string    `json:"email"`
-	Enable     bool      `json:"enable"`
-	AllowedIPs []string  `json:"allowedIPs"`
-	Address    []string  `json:"address"`
-	PrivateKey string    `json:"privateKey"`
-	PublicKey  string    `json:"publicKey"`
-	Created    time.Time `json:"created"`
-	Updated    time.Time `json:"updated"`
+	Id                        string    `json:"id"`
+	Name                      string    `json:"name"`
+	Email                     string    `json:"email"`
+	Enable                    bool      `json:"enable"`
+	IgnorePersistentKeepalive bool      `json:"ignorePersistentKeepalive"`
+	AllowedIPs                []string  `json:"allowedIPs"`
+	Address                   []string  `json:"address"`
+	PrivateKey                string    `json:"privateKey"`
+	PublicKey                 string    `json:"publicKey"`
+	Created                   time.Time `json:"created"`
+	Updated                   time.Time `json:"updated"`
 }
 
 func (a Client) IsValid() []error {
@@ -31,13 +32,11 @@ func (a Client) IsValid() []error {
 	if len(a.Name) < 2 || len(a.Name) > 40 {
 		errs = append(errs, fmt.Errorf("name field must be between 2-40 chars"))
 	}
-	// check if the email empty
-	if a.Email == "" {
-		errs = append(errs, fmt.Errorf("email field is required"))
-	}
-	// check if email valid
-	if !util.RegexpEmail.MatchString(a.Email) {
-		errs = append(errs, fmt.Errorf("email %s is invalid", a.Email))
+	// email is not required, but if provided must match regex
+	if a.Email != "" {
+		if !util.RegexpEmail.MatchString(a.Email) {
+			errs = append(errs, fmt.Errorf("email %s is invalid", a.Email))
+		}
 	}
 	// check if the allowedIPs empty
 	if len(a.AllowedIPs) == 0 {

@@ -1,7 +1,7 @@
 FROM golang:alpine AS build-back
 WORKDIR /app
 COPY . .
-RUN go build -o wg-gen-web-linux
+RUN GIT_COMMIT=$(git rev-parse --short HEAD) && go build -ldflags "-X main.VersionGitCommit=$GIT_COMMIT" go build -o wg-gen-web-linux
 
 FROM node:10-alpine AS build-front
 WORKDIR /app

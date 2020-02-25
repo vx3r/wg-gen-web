@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "axios": "^0.19.2",
+    "git-describe": "^4.0.4",
     "is-cidr": "^3.1.0",
     "moment": "^2.24.0",
     "vue": "^2.6.10",

@@ -15,6 +15,10 @@ import (
 	"path/filepath"
 )
 
+var (
+	VersionGitCommit string
+)
+
 func init() {
 	log.SetFormatter(&log.TextFormatter{})
 	log.SetOutput(os.Stderr)
@@ -22,6 +26,8 @@ func init() {
 }
 
 func main() {
+	log.Infof("Starting Wg Gen Web version: %s", VersionGitCommit)
+
 	// load .env environment variables
 	err := godotenv.Load()
 	if err != nil {
@@ -59,6 +65,8 @@ func main() {
 		gin.SetMode(gin.ReleaseMode)
 		// disable console color
 		gin.DisableConsoleColor()
+		// log level info
+		log.SetLevel(log.InfoLevel)
 	}
 
 	// migrate

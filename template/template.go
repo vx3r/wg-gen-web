@@ -211,7 +211,7 @@ PublicKey = {{ .Server.PublicKey }}
 PresharedKey = {{ .Server.PresharedKey }}
 AllowedIPs = {{ StringsJoin .Client.AllowedIPs ", " }}
 Endpoint = {{ .Server.Endpoint }}
-{{ if ne .Server.PersistentKeepalive 0 -}}
+{{ if and (ne .Server.PersistentKeepalive 0) (not .Client.IgnorePersistentKeepalive) -}}
 PersistentKeepalive = {{.Server.PersistentKeepalive}}
 {{- end}}
 `

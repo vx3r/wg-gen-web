@@ -123,27 +123,19 @@
                                 <v-text-field
                                         v-model="client.name"
                                         label="Client friendly name"
-                                        :rules="[
-                          v => !!v || 'Client name is required',
-                        ]"
+                                        :rules="[ v => !!v || 'Client name is required', ]"
                                         required
                                 />
                                 <v-text-field
                                         v-model="client.email"
                                         label="Client email"
-                                        :rules="[
-                        v => !!v || 'E-mail is required',
-                        v => /.+@.+\..+/.test(v) || 'E-mail must be valid',
-                      ]"
-                                        required
+                                        :rules="[ v => (/.+@.+\..+/.test(v) || v === '') || 'E-mail must be valid',]"
                                 />
                                 <v-select
                                         v-model="client.address"
                                         :items="server.address"
                                         label="Client IP will be chosen from these networks"
-                                        :rules="[
-                                v => !!v || 'Network is required',
-                        ]"
+                                        :rules="[ v => !!v || 'Network is required', ]"
                                         multiple
                                         chips
                                         persistent-hint
@@ -175,6 +167,12 @@
                                         color="red"
                                         inset
                                         :label="client.enable ? 'Enable client after creation': 'Disable client after creation'"
+                                />
+                                <v-switch
+                                        v-model="client.ignorePersistentKeepalive"
+                                        color="red"
+                                        inset
+                                        :label="'Ignore global persistent keepalive: ' + (client.ignorePersistentKeepalive ? 'Yes': 'NO')"
                                 />
                             </v-form>
                         </v-col>
@@ -219,18 +217,13 @@
                                 <v-text-field
                                         v-model="client.name"
                                         label="Friendly name"
-                                        :rules="[
-                          v => !!v || 'Client name is required',
-                        ]"
+                                        :rules="[ v => !!v || 'Client name is required',]"
                                         required
                                 />
                                 <v-text-field
                                         v-model="client.email"
                                         label="Email"
-                                        :rules="[
-                        v => !!v || 'Email is required',
-                        v => /.+@.+\..+/.test(v) || 'Email must be valid',
-                        ]"
+                                        :rules="[ v => (/.+@.+\..+/.test(v) || v === '') || 'E-mail must be valid',]"
                                         required
                                 />
                                 <v-combobox
@@ -273,6 +266,12 @@
                                         </v-chip>
                                     </template>
                                 </v-combobox>
+                                <v-switch
+                                        v-model="client.ignorePersistentKeepalive"
+                                        color="red"
+                                        inset
+                                        :label="'Ignore global persistent keepalive: ' + (client.ignorePersistentKeepalive ? 'Yes': 'NO')"
+                                />
                             </v-form>
                         </v-col>
                     </v-row>
