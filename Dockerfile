@@ -8,6 +8,7 @@ WORKDIR /app
 COPY ui/package*.json ./
 RUN npm install
 COPY ui/ ./
+COPY .git .
 RUN npm run build
 
 FROM alpine
