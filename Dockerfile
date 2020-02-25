@@ -1,10 +1,12 @@
 FROM golang:alpine AS build-back
 WORKDIR /app
+RUN apk update && apk upgrade && apk add --no-cache git
 COPY . .
 RUN GIT_COMMIT=$(git rev-parse --short HEAD) && go build -ldflags "-X main.VersionGitCommit=$GIT_COMMIT" go build -o wg-gen-web-linux
 
 FROM node:10-alpine AS build-front
 WORKDIR /app
+RUN apk update && apk upgrade && apk add --no-cache git
 COPY ui/package*.json ./
 RUN npm install
 COPY ui/ ./

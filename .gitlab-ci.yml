@@ -7,7 +7,7 @@ build-back:
   stage: build artifacts
   image: golang:latest
   script:
-    - GOOS=linux GOARCH=amd64 go build -o ${CI_PROJECT_NAME}-linux-amd64
+    - GOOS=linux GOARCH=amd64 go build -ldflags "-X main.VersionGitCommit=${CI_COMMIT_SHORT_SHA}" -o ${CI_PROJECT_NAME}-linux-amd64
   artifacts:
     paths:
       - ${CI_PROJECT_NAME}-linux-amd64
@@ -16,6 +16,9 @@ build-front:
   stage: build artifacts
   image: node:10-alpine
   script:
+    - apk update
+    - apk upgrade
+    - apk add --no-cache git
     - cd ./ui
     - npm install
     - npm run build
