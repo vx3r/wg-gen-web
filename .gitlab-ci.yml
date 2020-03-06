@@ -7,7 +7,7 @@ build-back:
   stage: build artifacts
   image: golang:latest
   script:
-    - GOOS=linux GOARCH=amd64 go build -ldflags="-X 'gitlab.127-0-0-1.fr/vx3r/wg-gen-web/util.Version=${CI_COMMIT_SHORT_SHA}'" -o ${CI_PROJECT_NAME}-linux-amd64
+    - GOOS=linux GOARCH=amd64 go build -ldflags="-X 'gitlab.127-0-0-1.fr/vx3r/wg-gen-web/util.Version=${CI_COMMIT_SHA}'" -o ${CI_PROJECT_NAME}-linux-amd64
   artifacts:
     paths:
       - ${CI_PROJECT_NAME}-linux-amd64
@@ -29,7 +29,7 @@ build:
   image: docker:latest
   script:
     - docker info
-    - docker build --build-arg COMMIT=${CI_COMMIT_SHORT_SHA} --network br_docker --tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA} .
+    - docker build --build-arg COMMIT=${CI_COMMIT_SHA} --network br_docker --tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA} .
 
 push:
   stage: push docker hub

@@ -7,14 +7,6 @@
                         <v-list-item-content>
                             <v-list-item-title class="headline">Server's interface configuration</v-list-item-title>
                         </v-list-item-content>
-                        <v-btn
-                                class="ma-2"
-                                color="warning"
-                                @click="updateServer"
-                        >
-                            Update server configuration
-                            <v-icon right dark>mdi-update</v-icon>
-                        </v-btn>
                     </v-list-item>
                     <div class="d-flex flex-no-wrap justify-space-between">
                         <v-col cols="12">
@@ -67,14 +59,6 @@
                         <v-list-item-content>
                             <v-list-item-title class="headline">Client's global configuration</v-list-item-title>
                         </v-list-item-content>
-                        <v-btn
-                                class="ma-2"
-                                color="warning"
-                                @click="updateServer"
-                        >
-                            Update server configuration
-                            <v-icon right dark>mdi-update</v-icon>
-                        </v-btn>
                     </v-list-item>
                     <div class="d-flex flex-no-wrap justify-space-between">
                         <v-col cols="12">
@@ -130,14 +114,6 @@
                         <v-list-item-content>
                             <v-list-item-title class="headline">Interface configuration hooks</v-list-item-title>
                         </v-list-item-content>
-                        <v-btn
-                                class="ma-2"
-                                color="warning"
-                                @click="updateServer"
-                        >
-                            Update server configuration
-                            <v-icon right dark>mdi-update</v-icon>
-                        </v-btn>
                     </v-list-item>
                     <div class="d-flex flex-no-wrap justify-space-between">
                         <v-col cols="12">
@@ -162,13 +138,32 @@
                 </v-card>
             </v-col>
         </v-row>
-        <v-divider dark/>
-        <v-divider dark/>
+        <v-row>
+            <v-divider dark/>
+            <v-btn
+                    class="ma-2"
+                    color="success"
+                    :href="`${apiBaseUrl}/server/config`"
+            >
+                Download server configuration
+                <v-icon right dark>mdi-cloud-download-outline</v-icon>
+            </v-btn>
+            <v-spacer></v-spacer>
+            <v-btn
+                    class="ma-2"
+                    color="warning"
+                    @click="updateServer"
+            >
+                Update server configuration
+                <v-icon right dark>mdi-update</v-icon>
+            </v-btn>
+            <v-divider dark/>
+        </v-row>
         <Notification v-bind:notification="notification"/>
     </v-container>
 </template>
 <script>
-  import {ApiService} from "../services/ApiService";
+  import {API_BASE_URL, ApiService} from "../services/ApiService";
   import Notification from '../components/Notification'
 
   export default {
@@ -181,6 +176,7 @@
     data: () => ({
       api: null,
       server: null,
+      apiBaseUrl: API_BASE_URL,
       notification: {
         show: false,
         color: '',

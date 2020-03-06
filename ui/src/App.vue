@@ -28,7 +28,17 @@
     </v-content>
 
     <v-footer app>
-      <span>License <a class="pr-1 pl-1" href="http://www.wtfpl.net/" target="_blank">WTFPL</a> &copy; {{ new Date().getFullYear() }} Created with</span><v-icon class="pr-1 pl-1">mdi-heart</v-icon><span>by</span><a class="pr-1 pl-1" href="mailto:vx3r@127-0-0-1.fr">vx3r</a><v-spacer></v-spacer><span>Version: {{ version }}</span>
+      <small>Copyright &copy; {{ new Date().getFullYear() }}, Wg Gen Web.</small>
+      <small>This work is licensed under a <a class="pr-1 pl-1" href="http://www.wtfpl.net/" target="_blank">WTFPL License.</a></small>
+
+      <v-spacer></v-spacer>
+
+      <small>Created with</small>
+      <v-icon class="pr-1 pl-1">mdi-heart</v-icon><span>by</span><a class="pr-1 pl-1" href="mailto:vx3r@127-0-0-1.fr">vx3r</a>
+
+      <v-spacer></v-spacer>
+
+      <a :href="'https://github.com/vx3r/wg-gen-web/commit/' + version"><kbd>Version: {{ version.substring(0,7) }}</kbd></a>
     </v-footer>
 
   </v-app>

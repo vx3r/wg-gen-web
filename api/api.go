@@ -6,6 +6,7 @@ import (
 	"github.com/skip2/go-qrcode"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/core"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/model"
+	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/template"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/util"
 	"net/http"
 )
@@ -28,6 +29,7 @@ func ApplyRoutes(r *gin.Engine) {
 	{
 		server.GET("", readServer)
 		server.PATCH("", updateServer)
+		server.GET("/config", configServer)
 		server.GET("/version", version)
 	}
 }
@@ -201,6 +203,39 @@ func updateServer(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, client)
+}
+
+func configServer(c *gin.Context) {
+	clients, err := core.ReadClients()
+	if err != nil {
+		log.WithFields(log.Fields{
+			"err": err,
+		}).Error("failed to read clients")
+		c.AbortWithStatus(http.StatusUnprocessableEntity)
+		return
+	}
+
+	server, err := core.ReadServer()
+	if err != nil {
+		log.WithFields(log.Fields{
+			"err": err,
+		}).Error("failed to read server")
+		c.AbortWithStatus(http.StatusUnprocessableEntity)
+		return
+	}
+
+	configData, err := template.DumpServerWg(clients, server)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"err": err,
+		}).Error("failed to dump wg config")
+		c.AbortWithStatus(http.StatusUnprocessableEntity)
+		return
+	}
+
+	// return config as txt file
+	c.Header("Content-Disposition", "attachment; filename=wg0.conf")
+	c.Data(http.StatusOK, "application/config", configData)
 }
 
 func version(c *gin.Context) {
