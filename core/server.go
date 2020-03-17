@@ -55,6 +55,12 @@ func ReadServer() (*model.Server, error) {
 		if err != nil {
 			return nil, err
 		}
+
+		// server.json was missing, dump wg config after creation
+		err = UpdateServerConfigWg()
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	c, err := storage.Deserialize("server.json")

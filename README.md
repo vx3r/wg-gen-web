@@ -52,8 +52,8 @@ services:
     image: vx3r/wg-gen-web:latest
     container_name: wg-gen-web
     restart: unless-stopped
-    expose:
-      - "8080/tcp"
+    ports:
+      - 8080:8080
     environment:
       - WG_CONF_DIR=/data
       - WG_INTERFACE_NAME=wg0.conf
