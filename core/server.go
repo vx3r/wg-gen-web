@@ -25,12 +25,6 @@ func ReadServer() (*model.Server, error) {
 		server.PrivateKey = key.String()
 		server.PublicKey = key.PublicKey().String()
 
-		presharedKey, err := wgtypes.GenerateKey()
-		if err != nil {
-			return nil, err
-		}
-		server.PresharedKey = presharedKey.String()
-
 		server.Endpoint = "wireguard.example.com:123"
 		server.ListenPort = 51820
 
@@ -91,7 +85,7 @@ func UpdateServer(server *model.Server) (*model.Server, error) {
 
 	server.PrivateKey = current.(*model.Server).PrivateKey
 	server.PublicKey = current.(*model.Server).PublicKey
-	server.PresharedKey = current.(*model.Server).PresharedKey
+	//server.PresharedKey = current.(*model.Server).PresharedKey
 	server.Updated = time.Now().UTC()
 
 	err = storage.Serialize("server.json", server)

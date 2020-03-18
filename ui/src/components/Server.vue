@@ -16,11 +16,6 @@
                                     disabled
                             />
                             <v-text-field
-                                    v-model="server.presharedKey"
-                                    label="Preshared key"
-                                    disabled
-                            />
-                            <v-text-field
                                     v-model="server.listenPort"
                                     type="number"
                                     :rules="[

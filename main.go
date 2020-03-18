@@ -29,7 +29,7 @@ func main() {
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,
-		}).Fatal("failed to initialize env")
+		}).Fatal("failed to load .env file")
 	}
 
 	// check directories or create it
@@ -39,11 +39,11 @@ func main() {
 			log.WithFields(log.Fields{
 				"err": err,
 				"dir": filepath.Join(os.Getenv("WG_CONF_DIR")),
-			}).Fatal("failed to mkdir")
+			}).Fatal("failed to create directory")
 		}
 	}
 
-	// check if server.json exists otherwise create it
+	// check if server.json exists otherwise create it with default values
 	if !util.FileExists(filepath.Join(os.Getenv("WG_CONF_DIR"), "server.json")) {
 		_, err = core.ReadServer()
 		if err != nil {
@@ -66,23 +66,36 @@ func main() {
 	}
 
 	// migrate
-	err = core.Migrate()
+	err = core.MigrateInitialStructChange()
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,
-		}).Fatal("failed to migrate")
+		}).Fatal("failed to migrate initial struct changes")
+	}
+	err = core.MigratePresharedKey()
+	if err != nil {
+		log.WithFields(log.Fields{
+			"err": err,
+		}).Fatal("failed to migrate preshared key struct changes")
+	}
+
+	// dump wg config file
+	err = core.UpdateServerConfigWg()
+	if err != nil {
+		log.WithFields(log.Fields{
+			"err": err,
+		}).Fatal("failed to dump wg config file")
 	}
 
 	// creates a gin router with default middleware: logger and recovery (crash-free) middleware
 	app := gin.Default()
 
-	// same as
+	// cors middleware
 	config := cors.DefaultConfig()
 	config.AllowAllOrigins = true
 	app.Use(cors.New(config))
-	//app.Use(cors.Default())
 
-	// protection
+	// protection middleware
 	app.Use(helmet.Default())
 
 	// no route redirect to frontend app

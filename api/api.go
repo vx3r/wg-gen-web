@@ -142,7 +142,7 @@ func configClient(c *gin.Context) {
 		return
 	}
 	// return config as png qrcode
-	png, err := qrcode.Encode(string(configData), qrcode.Medium, 220)
+	png, err := qrcode.Encode(string(configData), qrcode.Medium, 250)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,

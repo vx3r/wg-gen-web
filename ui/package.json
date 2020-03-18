@@ -13,7 +13,7 @@
     "vue": "^2.6.10",
     "vue-moment": "^4.1.0",
     "vue-router": "^3.1.6",
-    "vuetify": "^2.2.17"
+    "vuetify": "^2.2.18"
   },
   "devDependencies": {
     "@vue/cli-plugin-router": "^4.2.3",

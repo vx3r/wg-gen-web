@@ -42,6 +42,12 @@ func CreateClient(client *model.Client) (*model.Client, error) {
 	client.PrivateKey = key.String()
 	client.PublicKey = key.PublicKey().String()
 
+	presharedKey, err := wgtypes.GenerateKey()
+	if err != nil {
+		return nil, err
+	}
+	client.PresharedKey = presharedKey.String()
+
 	reserverIps, err := GetAllReservedIps()
 	if err != nil {
 		return nil, err

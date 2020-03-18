@@ -13,6 +13,7 @@ type Client struct {
 	Email                     string    `json:"email"`
 	Enable                    bool      `json:"enable"`
 	IgnorePersistentKeepalive bool      `json:"ignorePersistentKeepalive"`
+	PresharedKey              string    `json:"presharedKey"`
 	AllowedIPs                []string  `json:"allowedIPs"`
 	Address                   []string  `json:"address"`
 	PrivateKey                string    `json:"privateKey"`

@@ -13,7 +13,6 @@ type Server struct {
 	Mtu                 int       `json:"mtu"`
 	PrivateKey          string    `json:"privateKey"`
 	PublicKey           string    `json:"publicKey"`
-	PresharedKey        string    `json:"presharedKey"`
 	Endpoint            string    `json:"endpoint"`
 	PersistentKeepalive int       `json:"persistentKeepalive"`
 	Dns                 []string  `json:"dns"`
