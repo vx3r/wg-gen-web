@@ -167,7 +167,11 @@ func MigratePresharedKey() error {
 		c.Name = client["name"].(string)
 		c.Email = client["email"].(string)
 		c.Enable = client["enable"].(bool)
-		c.IgnorePersistentKeepalive = client["ignorePersistentKeepalive"].(bool)
+		if val, ok := client["ignorePersistentKeepalive"]; ok {
+			c.IgnorePersistentKeepalive = val.(bool)
+		} else {
+			c.IgnorePersistentKeepalive = false
+		}
 		c.PresharedKey = s["presharedKey"].(string)
 		c.AllowedIPs = make([]string, 0)
 		for _, address := range client["allowedIPs"].([]interface{}) {
