@@ -117,7 +117,7 @@ var (
                                                                     <td class="h4 pb20" style="color:#ffffff; font-family:'Muli', Arial,sans-serif; font-size:20px; line-height:28px; text-align:left; padding-bottom:20px;">Hello</td>
                                                                 </tr>
                                                                 <tr>
-                                                                    <td class="text pb20" style="color:#ffffff; font-family:Arial,sans-serif; font-size:14px; line-height:26px; text-align:left; padding-bottom:20px;">You probably requested VPN configuration. Here is <strong>{{.Client.Name}}</strong> configuration created <strong>{{.Client.Created.Format "Jan 02, 2006 15:04:05 UTC"}}</strong>. Scan the Qrcode or open attached configuration file in VPN client.</td>
+                                                                    <td class="text pb20" style="color:#ffffff; font-family:Arial,sans-serif; font-size:14px; line-height:26px; text-align:left; padding-bottom:20px;">You probably requested VPN configuration. Here is <strong>{{.Client.Name}}</strong> configuration created <strong>{{.Client.Created.Format "Monday, 02 January 06 15:04:05 MST"}}</strong>. Scan the Qrcode or open attached configuration file in VPN client.</td>
                                                                 </tr>
                                                             </table>
                                                         </th>
