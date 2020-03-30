@@ -55,34 +55,61 @@
                                     </v-chip>
                                 </v-card-text>
                                 <v-card-actions>
-                                    <v-btn
-                                            text
-                                            :href="`${apiBaseUrl}/client/${client.id}/config?qrcode=false`"
-                                    >
-                                        <span class="d-none d-lg-flex">Download</span>
-                                        <v-icon right dark>mdi-cloud-download-outline</v-icon>
-                                    </v-btn>
-                                    <v-btn
+                                  <v-tooltip bottom>
+                                    <template v-slot:activator="{ on }">
+                                      <v-btn
+                                              text
+                                              :href="`${apiBaseUrl}/client/${client.id}/config?qrcode=false`"
+                                              v-on="on"
+                                      >
+                                          <span class="d-none d-lg-flex">Download</span>
+                                          <v-icon right dark>mdi-cloud-download-outline</v-icon>
+                                      </v-btn>
+                                    </template>
+                                    <span>Download</span>
+                                  </v-tooltip>
+
+                                  <v-tooltip bottom>
+                                    <template v-slot:activator="{ on }">
+                                      <v-btn
                                             text
                                             @click.stop="startUpdateClient(client)"
-                                    >
+                                            v-on="on"
+                                      >
                                         <span class="d-none d-lg-flex">Edit</span>
                                         <v-icon right dark>mdi-square-edit-outline</v-icon>
                                     </v-btn>
+                                    </template>
+                                    <span>Edit</span>
+                                  </v-tooltip>
+
+                                  <v-tooltip bottom>
+                                    <template v-slot:activator="{ on }">
                                       <v-btn
                                               text
                                               @click="deleteClient(client)"
+                                              v-on="on"
                                       >
                                           <span class="d-none d-lg-flex">Delete</span>
                                           <v-icon right dark>mdi-trash-can-outline</v-icon>
                                       </v-btn>
-                                    <v-btn
-                                            text
-                                            @click="sendEmailClient(client.id)"
-                                    >
-                                        <span class="d-none d-lg-flex">Send Email</span>
-                                        <v-icon right dark>mdi-email-send-outline</v-icon>
-                                    </v-btn>
+                                    </template>
+                                    <span>Delete</span>
+                                  </v-tooltip>
+
+                                  <v-tooltip bottom>
+                                    <template v-slot:activator="{ on }">
+                                      <v-btn
+                                              text
+                                              @click="sendEmailClient(client.id)"
+                                              v-on="on"
+                                      >
+                                          <span class="d-none d-lg-flex">Send Email</span>
+                                          <v-icon right dark>mdi-email-send-outline</v-icon>
+                                      </v-btn>
+                                    </template>
+                                    <span>Send Email</span>
+                                  </v-tooltip>
                                     <v-spacer/>
                                     <v-tooltip right>
                                         <template v-slot:activator="{ on }">
