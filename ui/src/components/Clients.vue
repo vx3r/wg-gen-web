@@ -19,7 +19,7 @@
                         <v-col
                                 v-for="(client, i) in clients"
                                 :key="i"
-                                cols="6"
+                                sm12 lg6
                         >
                             <v-card
                                     :color="client.enable ? '#1F7087' : 'warning'"
@@ -59,28 +59,28 @@
                                             text
                                             :href="`${apiBaseUrl}/client/${client.id}/config?qrcode=false`"
                                     >
-                                        Download
+                                        <span class="d-none d-lg-flex">Download</span>
                                         <v-icon right dark>mdi-cloud-download-outline</v-icon>
                                     </v-btn>
                                     <v-btn
                                             text
                                             @click.stop="startUpdateClient(client)"
                                     >
-                                        Edit
+                                        <span class="d-none d-lg-flex">Edit</span>
                                         <v-icon right dark>mdi-square-edit-outline</v-icon>
                                     </v-btn>
-                                    <v-btn
-                                            text
-                                            @click="deleteClient(client)"
-                                    >
-                                        Delete
-                                        <v-icon right dark>mdi-trash-can-outline</v-icon>
-                                    </v-btn>
+                                      <v-btn
+                                              text
+                                              @click="deleteClient(client)"
+                                      >
+                                          <span class="d-none d-lg-flex">Delete</span>
+                                          <v-icon right dark>mdi-trash-can-outline</v-icon>
+                                      </v-btn>
                                     <v-btn
                                             text
                                             @click="sendEmailClient(client.id)"
                                     >
-                                        Send email
+                                        <span class="d-none d-lg-flex">Send Email</span>
                                         <v-icon right dark>mdi-email-send-outline</v-icon>
                                     </v-btn>
                                     <v-spacer/>
