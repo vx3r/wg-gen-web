@@ -140,6 +140,38 @@ Feel free to modify this file in order to use your existing keys
  * Join us on [Discord](https://discord.gg/fjx7gGJ)
  * Create an issue
 
+## Development
+
+### Backend
+
+From the top level directory run
+
+```
+$ go run main.go
+```
+
+### Frontend
+
+Inside another terminal session navigate into the `ui` folder
+
+```
+$ cd ui
+```
+Install required dependencies
+```
+$ npm install
+```
+Set the base url for the api
+```
+$ export VUE_APP_API_BASE_URL=http://localhost:8080/api/v1.0
+```
+Start the development server. It will rebuild and reload the site once you make a change to the source code.
+```
+$ npm run serve
+```
+
+Now you can access the site from a webbrowser with the url `http://localhost:8081`.
+
 ## Application stack
 
  * [Gin, HTTP web framework written in Go](https://github.com/gin-gonic/gin)
