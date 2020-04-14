@@ -85,6 +85,26 @@
                                     </v-chip>
                                 </template>
                             </v-combobox>
+                            <v-combobox
+                                    v-model="server.allowedips"
+                                    chips
+                                    hint="Write IPv4 or IPv6 address and hit enter"
+                                    label="Default Allowed IPs for clients"
+                                    multiple
+                                    dark
+                            >
+                                <template v-slot:selection="{ attrs, item, select, selected }">
+                                    <v-chip
+                                            v-bind="attrs"
+                                            :input-value="selected"
+                                            close
+                                            @click="select"
+                                            @click:close="server.allowedips.splice(server.allowedips.indexOf(item), 1)"
+                                    >
+                                        <strong>{{ item }}</strong>&nbsp;
+                                    </v-chip>
+                                </template>
+                            </v-combobox>
                             <v-text-field
                                     type="number"
                                     v-model="server.mtu"
@@ -214,6 +234,18 @@
         for (let i = 0; i < this.server.dns.length; i++){
           if (this.$isCidr(this.server.dns[i] + '/32') === 0) {
             this.notify('error', `Invalid IP detected, please correct ${this.server.dns[i]} before submitting`);
+            return
+          }
+        }
+
+        // check client AllowedIPs
+        if (this.server.allowedips.length < 1) {
+          this.notify('error', 'Please provide at least one valid CIDR address for client allowed IPs');
+          return;
+        }
+        for (let i = 0; i < this.server.allowedips.length; i++){
+          if (this.$isCidr(this.server.allowedips[i]) === 0) {
+            this.notify('error', 'Invalid CIDR detected, please correct before submitting');
             return
           }
         }

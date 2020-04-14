@@ -382,7 +382,7 @@
           name: "",
           email: "",
           enable: true,
-          allowedIPs: ["0.0.0.0/0", "::/0"],
+          allowedIPs: this.server.allowedips,
           address: this.server.address,
         }
       },

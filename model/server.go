@@ -16,6 +16,7 @@ type Server struct {
 	Endpoint            string    `json:"endpoint"`
 	PersistentKeepalive int       `json:"persistentKeepalive"`
 	Dns                 []string  `json:"dns"`
+	AllowedIPs          []string  `json:"allowedips"`
 	PreUp               string    `json:"preUp"`
 	PostUp              string    `json:"postUp"`
 	PreDown             string    `json:"preDown"`
@@ -57,6 +58,12 @@ func (a Server) IsValid() []error {
 	for _, dns := range a.Dns {
 		if !util.IsValidIp(dns) {
 			errs = append(errs, fmt.Errorf("dns %s is invalid", dns))
+		}
+	}
+	// check if the allowedIPs are valid
+	for _, allowedIP := range a.AllowedIPs {
+		if !util.IsValidCidr(allowedIP) {
+			errs = append(errs, fmt.Errorf("allowedIP %s is invalid", allowedIP))
 		}
 	}
 

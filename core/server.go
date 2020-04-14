@@ -36,6 +36,10 @@ func ReadServer() (*model.Server, error) {
 		server.Dns = append(server.Dns, "fd9f::10:0:0:2")
 		server.Dns = append(server.Dns, "10.0.0.2")
 
+		server.AllowedIPs = make([]string, 0)
+		server.AllowedIPs = append(server.AllowedIPs, "0.0.0.0/0")
+		server.AllowedIPs = append(server.AllowedIPs, "::/0")
+
 		server.PersistentKeepalive = 16
 		server.Mtu = 0
 		server.PreUp = "echo WireGuard PreUp"
