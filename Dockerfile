@@ -4,7 +4,7 @@ FROM golang:alpine AS build-back
 WORKDIR /app
 ARG COMMIT
 COPY . .
-RUN go build -ldflags="-X 'gitlab.127-0-0-1.fr/vx3r/wg-gen-web/util.Version=${COMMIT}'" -o wg-gen-web-linux
+RUN go build -ldflags="-X 'gitlab.127-0-0-1.fr/vx3r/wg-gen-web/version.Version=${COMMIT}'" gitlab.127-0-0-1.fr/vx3r/wg-gen-web/cmd/wg-gen-web -o wg-gen-web-linux
 
 FROM node:10-alpine AS build-front
 WORKDIR /app

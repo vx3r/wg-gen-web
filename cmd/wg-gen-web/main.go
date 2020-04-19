@@ -11,6 +11,7 @@ import (
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/api"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/core"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/util"
+	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/version"
 	"os"
 	"path/filepath"
 )
@@ -22,7 +23,7 @@ func init() {
 }
 
 func main() {
-	log.Infof("Starting Wg Gen Web version: %s", util.Version)
+	log.Infof("Starting Wg Gen Web version: %s", version.Version)
 
 	// load .env environment variables
 	err := godotenv.Load()
@@ -63,20 +64,6 @@ func main() {
 		gin.DisableConsoleColor()
 		// log level info
 		log.SetLevel(log.InfoLevel)
-	}
-
-	// migrate
-	err = core.MigrateInitialStructChange()
-	if err != nil {
-		log.WithFields(log.Fields{
-			"err": err,
-		}).Fatal("failed to migrate initial struct changes")
-	}
-	err = core.MigratePresharedKey()
-	if err != nil {
-		log.WithFields(log.Fields{
-			"err": err,
-		}).Fatal("failed to migrate preshared key struct changes")
 	}
 
 	// dump wg config file

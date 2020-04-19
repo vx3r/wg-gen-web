@@ -25,6 +25,7 @@ type Server struct {
 	Updated             time.Time `json:"updated"`
 }
 
+// IsValid check if model is valid
 func (a Server) IsValid() []error {
 	errs := make([]error, 0)
 

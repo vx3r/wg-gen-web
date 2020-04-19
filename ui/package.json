@@ -13,11 +13,11 @@
     "vue": "^2.6.10",
     "vue-moment": "^4.1.0",
     "vue-router": "^3.1.6",
-    "vuetify": "^2.2.18"
+    "vuetify": "^2.2.22"
   },
   "devDependencies": {
-    "@vue/cli-plugin-router": "^4.2.3",
-    "@vue/cli-service": "^4.2.3",
+    "@vue/cli-plugin-router": "^4.3.1",
+    "@vue/cli-service": "^4.3.1",
     "sass": "^1.26.3",
     "sass-loader": "^8.0.0",
     "vue-cli-plugin-vuetify": "^2.0.5",

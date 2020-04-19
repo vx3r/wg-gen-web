@@ -7,7 +7,7 @@ import (
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/core"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/model"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/template"
-	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/util"
+	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/version"
 	"net/http"
 )
 
@@ -30,7 +30,7 @@ func ApplyRoutes(r *gin.Engine) {
 		server.GET("", readServer)
 		server.PATCH("", updateServer)
 		server.GET("/config", configServer)
-		server.GET("/version", version)
+		server.GET("/version", versionStr)
 	}
 }
 
@@ -238,8 +238,8 @@ func configServer(c *gin.Context) {
 	c.Data(http.StatusOK, "application/config", configData)
 }
 
-func version(c *gin.Context) {
+func versionStr(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
-		"version": util.Version,
+		"version": version.Version,
 	})
 }

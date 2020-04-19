@@ -7,7 +7,7 @@ build-back:
   stage: build artifacts
   image: golang:latest
   script:
-    - GOOS=linux GOARCH=amd64 go build -ldflags="-X 'gitlab.127-0-0-1.fr/vx3r/wg-gen-web/util.Version=${CI_COMMIT_SHA}'" -o ${CI_PROJECT_NAME}-linux-amd64
+    - GOOS=linux GOARCH=amd64 go build -ldflags="-X 'gitlab.127-0-0-1.fr/vx3r/wg-gen-web/version.Version=${CI_COMMIT_SHA}'" gitlab.127-0-0-1.fr/vx3r/wg-gen-web/cmd/wg-gen-web -o ${CI_PROJECT_NAME}-linux-amd64
   artifacts:
     paths:
       - ${CI_PROJECT_NAME}-linux-amd64

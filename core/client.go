@@ -203,7 +203,7 @@ func ReadClientConfig(id string) ([]byte, error) {
 	return configDataWg, nil
 }
 
-// SendEmail to client
+// EmailClient send email to client
 func EmailClient(id string) error {
 	client, err := ReadClient(id)
 	if err != nil {
