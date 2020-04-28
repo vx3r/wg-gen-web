@@ -21,6 +21,7 @@ type Server struct {
 	PostUp              string    `json:"postUp"`
 	PreDown             string    `json:"preDown"`
 	PostDown            string    `json:"postDown"`
+	UpdatedBy           string    `json:"updatedBy"`
 	Created             time.Time `json:"created"`
 	Updated             time.Time `json:"updated"`
 }

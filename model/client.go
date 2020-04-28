@@ -18,6 +18,8 @@ type Client struct {
 	Address                   []string  `json:"address"`
 	PrivateKey                string    `json:"privateKey"`
 	PublicKey                 string    `json:"publicKey"`
+	CreatedBy                 string    `json:"createdBy"`
+	UpdatedBy                 string    `json:"updatedBy"`
 	Created                   time.Time `json:"created"`
 	Updated                   time.Time `json:"updated"`
 }

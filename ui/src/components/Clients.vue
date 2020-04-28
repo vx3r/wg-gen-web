@@ -9,7 +9,7 @@
                         </v-list-item-content>
                         <v-btn
                                 color="success"
-                                @click="startAddClient"
+                                @click="startCreate"
                         >
                             Add new client
                             <v-icon right dark>mdi-account-multiple-plus-outline</v-icon>
@@ -31,15 +31,15 @@
                                     <v-list-item-content>
                                         <v-list-item-title class="headline">{{ client.name }}</v-list-item-title>
                                         <v-list-item-subtitle>{{ client.email }}</v-list-item-subtitle>
-                                        <v-list-item-subtitle>Created: {{ client.created | formatDate }}</v-list-item-subtitle>
-                                        <v-list-item-subtitle>Updated: {{ client.updated | formatDate }}</v-list-item-subtitle>
+                                        <v-list-item-subtitle>Created: {{ client.created | formatDate }} by {{ client.createdBy }}</v-list-item-subtitle>
+                                        <v-list-item-subtitle>Updated: {{ client.updated | formatDate }} by {{ client.updatedBy }}</v-list-item-subtitle>
                                     </v-list-item-content>
 
                                     <v-list-item-avatar
                                             tile
                                             size="150"
                                     >
-                                        <v-img :src="`${apiBaseUrl}/client/${client.id}/config?qrcode=true`"/>
+                                        <v-img :src="'data:image/png;base64, ' + getClientQrcode(client.id)"/>
                                     </v-list-item-avatar>
                                 </v-list-item>
 
@@ -55,61 +55,61 @@
                                     </v-chip>
                                 </v-card-text>
                                 <v-card-actions>
-                                  <v-tooltip bottom>
-                                    <template v-slot:activator="{ on }">
-                                      <v-btn
-                                              text
-                                              :href="`${apiBaseUrl}/client/${client.id}/config?qrcode=false`"
-                                              v-on="on"
-                                      >
-                                          <span class="d-none d-lg-flex">Download</span>
-                                          <v-icon right dark>mdi-cloud-download-outline</v-icon>
-                                      </v-btn>
-                                    </template>
-                                    <span>Download</span>
-                                  </v-tooltip>
+                                    <v-tooltip bottom>
+                                        <template v-slot:activator="{ on }">
+                                            <v-btn
+                                                    text
+                                                    v-on:click="forceFileDownload(client)"
+                                                    v-on="on"
+                                            >
+                                                <span class="d-none d-lg-flex">Download</span>
+                                                <v-icon right dark>mdi-cloud-download-outline</v-icon>
+                                            </v-btn>
+                                        </template>
+                                        <span>Download</span>
+                                    </v-tooltip>
 
-                                  <v-tooltip bottom>
-                                    <template v-slot:activator="{ on }">
-                                      <v-btn
-                                            text
-                                            @click.stop="startUpdateClient(client)"
-                                            v-on="on"
-                                      >
-                                        <span class="d-none d-lg-flex">Edit</span>
-                                        <v-icon right dark>mdi-square-edit-outline</v-icon>
-                                    </v-btn>
-                                    </template>
-                                    <span>Edit</span>
-                                  </v-tooltip>
+                                    <v-tooltip bottom>
+                                        <template v-slot:activator="{ on }">
+                                            <v-btn
+                                                    text
+                                                    @click.stop="startUpdate(client)"
+                                                    v-on="on"
+                                            >
+                                                <span class="d-none d-lg-flex">Edit</span>
+                                                <v-icon right dark>mdi-square-edit-outline</v-icon>
+                                            </v-btn>
+                                        </template>
+                                        <span>Edit</span>
+                                    </v-tooltip>
 
-                                  <v-tooltip bottom>
-                                    <template v-slot:activator="{ on }">
-                                      <v-btn
-                                              text
-                                              @click="deleteClient(client)"
-                                              v-on="on"
-                                      >
-                                          <span class="d-none d-lg-flex">Delete</span>
-                                          <v-icon right dark>mdi-trash-can-outline</v-icon>
-                                      </v-btn>
-                                    </template>
-                                    <span>Delete</span>
-                                  </v-tooltip>
+                                    <v-tooltip bottom>
+                                        <template v-slot:activator="{ on }">
+                                            <v-btn
+                                                    text
+                                                    @click="remove(client)"
+                                                    v-on="on"
+                                            >
+                                                <span class="d-none d-lg-flex">Delete</span>
+                                                <v-icon right dark>mdi-trash-can-outline</v-icon>
+                                            </v-btn>
+                                        </template>
+                                        <span>Delete</span>
+                                    </v-tooltip>
 
-                                  <v-tooltip bottom>
-                                    <template v-slot:activator="{ on }">
-                                      <v-btn
-                                              text
-                                              @click="sendEmailClient(client.id)"
-                                              v-on="on"
-                                      >
-                                          <span class="d-none d-lg-flex">Send Email</span>
-                                          <v-icon right dark>mdi-email-send-outline</v-icon>
-                                      </v-btn>
-                                    </template>
-                                    <span>Send Email</span>
-                                  </v-tooltip>
+                                    <v-tooltip bottom>
+                                        <template v-slot:activator="{ on }">
+                                            <v-btn
+                                                    text
+                                                    @click="email(client)"
+                                                    v-on="on"
+                                            >
+                                                <span class="d-none d-lg-flex">Send Email</span>
+                                                <v-icon right dark>mdi-email-send-outline</v-icon>
+                                            </v-btn>
+                                        </template>
+                                        <span>Send Email</span>
+                                    </v-tooltip>
                                     <v-spacer/>
                                     <v-tooltip right>
                                         <template v-slot:activator="{ on }">
@@ -118,7 +118,7 @@
                                                     v-on="on"
                                                     color="success"
                                                     v-model="client.enable"
-                                                    v-on:change="updateClient(client)"
+                                                    v-on:change="update(client)"
                                             />
                                         </template>
                                         <span> {{client.enable ? 'Disable' : 'Enable'}} this client</span>
@@ -133,7 +133,7 @@
         </v-row>
         <v-dialog
                 v-if="client"
-                v-model="dialogAddClient"
+                v-model="dialogCreate"
                 max-width="550"
         >
             <v-card>
@@ -210,14 +210,14 @@
                     <v-btn
                             :disabled="!valid"
                             color="success"
-                            @click="addClient(client)"
+                            @click="create(client)"
                     >
                         Submit
                         <v-icon right dark>mdi-check-outline</v-icon>
                     </v-btn>
                     <v-btn
                             color="primary"
-                            @click="dialogAddClient = false"
+                            @click="dialogCreate = false"
                     >
                         Cancel
                         <v-icon right dark>mdi-close-circle-outline</v-icon>
@@ -227,7 +227,7 @@
         </v-dialog>
         <v-dialog
                 v-if="client"
-                v-model="dialogEditClient"
+                v-model="dialogUpdate"
                 max-width="550"
         >
             <v-card>
@@ -308,14 +308,14 @@
                     <v-btn
                             :disabled="!valid"
                             color="success"
-                            @click="updateClient(client)"
+                            @click="update(client)"
                     >
                         Submit
                         <v-icon right dark>mdi-check-outline</v-icon>
                     </v-btn>
                     <v-btn
                             color="primary"
-                            @click="dialogEditClient = false"
+                            @click="dialogUpdate = false"
                     >
                         Cancel
                         <v-icon right dark>mdi-close-circle-outline</v-icon>
@@ -323,61 +323,50 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
-        <Notification v-bind:notification="notification"/>
     </v-container>
 </template>
 <script>
-  import {ApiService, API_BASE_URL} from '../services/ApiService'
-  import Notification from '../components/Notification'
+  import { mapActions, mapGetters } from 'vuex'
 
   export default {
     name: 'Clients',
 
-    components: {
-      Notification
-    },
-
     data: () => ({
-      api: null,
-      apiBaseUrl: API_BASE_URL,
-      clients: [],
-      notification: {
-        show: false,
-        color: '',
-        text: '',
-      },
-      dialogAddClient: false,
-      dialogEditClient: false,
+      dialogCreate: false,
+      dialogUpdate: false,
       client: null,
-      server: null,
       valid: false,
     }),
 
+    computed:{
+      ...mapGetters({
+        getClientQrcode: 'client/getClientQrcode',
+        getClientConfig: 'client/getClientConfig',
+        server: 'server/server',
+        clients: 'client/clients',
+        clientQrcodes: 'client/clientQrcodes',
+      }),
+    },
+
     mounted () {
-      this.api = new ApiService();
-      this.getClients();
-      this.getServer()
+      this.readAllClients()
+      this.readServer()
     },
 
     methods: {
-      getClients() {
-        this.api.get('/client').then((res) => {
-          this.clients = res
-        }).catch((e) => {
-          this.notify('error', e.response.status + ' ' + e.response.statusText);
-        });
-      },
+      ...mapActions('client', {
+        errorClient: 'error',
+        readAllClients: 'readAll',
+        creatClient: 'create',
+        updateClient: 'update',
+        deleteClient: 'delete',
+        emailClient: 'email',
+      }),
+      ...mapActions('server', {
+        readServer: 'read',
+      }),
 
-      getServer() {
-        this.api.get('/server').then((res) => {
-          this.server = res;
-        }).catch((e) => {
-          this.notify('error', e.response.status + ' ' + e.response.statusText);
-        });
-      },
-
-      startAddClient() {
-        this.dialogAddClient = true;
+      startCreate() {
         this.client = {
           name: "",
           email: "",
@@ -385,91 +374,87 @@
           allowedIPs: this.server.allowedips,
           address: this.server.address,
         }
+        this.dialogCreate = true;
       },
-      addClient(client) {
+
+      create(client) {
         if (client.allowedIPs.length < 1) {
-          this.notify('error', 'Please provide at least one valid CIDR address for client allowed IPs');
+          this.errorClient('Please provide at least one valid CIDR address for client allowed IPs')
           return;
         }
         for (let i = 0; i < client.allowedIPs.length; i++){
           if (this.$isCidr(client.allowedIPs[i]) === 0) {
-            this.notify('error', 'Invalid CIDR detected, please correct before submitting');
+            this.errorClient('Invalid CIDR detected, please correct before submitting')
             return
           }
         }
-        this.dialogAddClient = false;
-
-        this.api.post('/client', client).then((res) => {
-          this.notify('success', `Client ${res.name} successfully added`);
-          this.getClients()
-        }).catch((e) => {
-          this.notify('error', e.response.status + ' ' + e.response.statusText);
-        });
+        this.dialogCreate = false;
+        this.creatClient(client)
       },
 
-      deleteClient(client) {
+      remove(client) {
         if(confirm(`Do you really want to delete ${client.name} ?`)){
-          this.api.delete(`/client/${client.id}`).then((res) => {
-            this.notify('success', "Client successfully deleted");
-            this.getClients()
-          }).catch((e) => {
-            this.notify('error', e.response.status + ' ' + e.response.statusText);
-          });
+          this.deleteClient(client)
         }
       },
 
-      sendEmailClient(id) {
-        this.api.get(`/client/${id}/email`).then((res) => {
-          this.notify('success', "Email successfully sent");
-          this.getClients()
-        }).catch((e) => {
-          this.notify('error', e.response.status + ' ' + e.response.statusText);
-        });
+      email(client) {
+        if (!client.email){
+          this.errorClient('Client email is not defined')
+          return
+        }
+
+        if(confirm(`Do you really want to send email to ${client.email} with all configurations ?`)){
+          this.emailClient(client)
+        }
       },
 
-      startUpdateClient(client) {
+      startUpdate(client) {
         this.client = client;
-        this.dialogEditClient = true;
+        this.dialogUpdate = true;
       },
-      updateClient(client) {
+
+      update(client) {
         // check allowed IPs
         if (client.allowedIPs.length < 1) {
-          this.notify('error', 'Please provide at least one valid CIDR address for client allowed IPs');
+          this.errorClient('Please provide at least one valid CIDR address for client allowed IPs');
           return;
         }
         for (let i = 0; i < client.allowedIPs.length; i++){
           if (this.$isCidr(client.allowedIPs[i]) === 0) {
-            this.notify('error', 'Invalid CIDR detected, please correct before submitting');
+            this.errorClient('Invalid CIDR detected, please correct before submitting');
             return
           }
         }
         // check address
         if (client.address.length < 1) {
-          this.notify('error', 'Please provide at least one valid CIDR address for client');
+          this.errorClient('Please provide at least one valid CIDR address for client');
           return;
         }
         for (let i = 0; i < client.address.length; i++){
           if (this.$isCidr(client.address[i]) === 0) {
-            this.notify('error', 'Invalid CIDR detected, please correct before submitting');
+            this.errorClient('Invalid CIDR detected, please correct before submitting');
             return
           }
         }
         // all good, submit
-        this.dialogEditClient = false;
-
-        this.api.patch(`/client/${client.id}`, client).then((res) => {
-          this.notify('success', `Client ${res.name} successfully updated`);
-          this.getClients()
-        }).catch((e) => {
-          this.notify('error', e.response.status + ' ' + e.response.statusText);
-        });
+        this.dialogUpdate = false;
+        this.updateClient(client)
       },
 
-      notify(color, msg) {
-        this.notification.show = true;
-        this.notification.color = color;
-        this.notification.text = msg;
-      }
+      forceFileDownload(client){
+        let config = this.getClientConfig(client.id)
+        if (!config) {
+          this.errorClient('Failed to download client config');
+          return
+        }
+        const url = window.URL.createObjectURL(new Blob([config]))
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', 'wg0.conf') //or any other extension
+        document.body.appendChild(link)
+        link.click()
+      },
     }
   };
 </script>

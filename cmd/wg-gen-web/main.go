@@ -7,13 +7,24 @@ import (
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"github.com/patrickmn/go-cache"
 	log "github.com/sirupsen/logrus"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/api"
+	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/auth"
+	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/auth/fake"
+	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/auth/oauth2oidc"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/core"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/util"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/version"
+	"golang.org/x/oauth2"
+	"net/http"
 	"os"
 	"path/filepath"
+	"time"
+)
+
+var (
+	cacheDb = cache.New(60*time.Minute, 10*time.Minute)
 )
 
 func init() {
@@ -80,21 +91,88 @@ func main() {
 	// cors middleware
 	config := cors.DefaultConfig()
 	config.AllowAllOrigins = true
+	config.AddAllowHeaders("Authorization")
 	app.Use(cors.New(config))
 
 	// protection middleware
 	app.Use(helmet.Default())
 
-	// no route redirect to frontend app
-	app.NoRoute(func(c *gin.Context) {
-		c.Redirect(301, "/index.html")
+	// add cache storage to gin app
+	app.Use(func(ctx *gin.Context) {
+		ctx.Set("cache", cacheDb)
+		ctx.Next()
 	})
 
 	// serve static files
 	app.Use(static.Serve("/", static.LocalFile("./ui/dist", false)))
 
-	// apply api router
-	api.ApplyRoutes(app)
+	// setup Oauth2 client if enabled
+	var oauth2Client auth.Auth
+
+	switch os.Getenv("OAUTH2_PROVIDER_NAME") {
+	case "fake":
+		log.Warn("Oauth is set to fake, no actual authentication will be performed")
+		oauth2Client = &fake.Fake{}
+		err = oauth2Client.Setup()
+		if err != nil {
+			log.WithFields(log.Fields{
+				"OAUTH2_PROVIDER_NAME": "oauth2oidc",
+				"err":                  err,
+			}).Fatal("failed to setup Oauth2")
+		}
+	case "oauth2oidc":
+		log.Warn("Oauth is set to oauth2oidc, must be RFC implementation on server side")
+		oauth2Client = &oauth2oidc.Oauth2idc{}
+		err = oauth2Client.Setup()
+		if err != nil {
+			log.WithFields(log.Fields{
+				"OAUTH2_PROVIDER_NAME": "oauth2oidc",
+				"err":                  err,
+			}).Fatal("failed to setup Oauth2")
+		}
+	default:
+		log.WithFields(log.Fields{
+			"OAUTH2_PROVIDER_NAME": os.Getenv("OAUTH2_PROVIDER_NAME"),
+		}).Fatal("auth provider name unknown")
+	}
+
+	if os.Getenv("OAUTH2_ENABLE") == "true" {
+		oauth2Client = &oauth2oidc.Oauth2idc{}
+		err = oauth2Client.Setup()
+		if err != nil {
+			log.WithFields(log.Fields{
+				"err": err,
+			}).Fatal("failed to setup Oauth2")
+		}
+	}
+	app.Use(func(ctx *gin.Context) {
+		ctx.Set("oauth2Client", oauth2Client)
+		ctx.Next()
+	})
+
+	// apply api routes public
+	api.ApplyRoutes(app, false)
+
+	// simple middleware to check auth
+	app.Use(func(c *gin.Context) {
+		cacheDb := c.MustGet("cache").(*cache.Cache)
+
+		token := c.Request.Header.Get(util.AuthTokenHeaderName)
+
+		oauth2Token, exists := cacheDb.Get(token)
+		if exists && oauth2Token.(*oauth2.Token).AccessToken == token {
+			// will be accessible in auth endpoints
+			c.Set("oauth2Token", oauth2Token)
+			c.Next()
+			return
+		}
+
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	})
+
+	// apply api router private
+	api.ApplyRoutes(app, true)
 
 	err = app.Run(fmt.Sprintf("%s:%s", os.Getenv("SERVER"), os.Getenv("PORT")))
 	if err != nil {

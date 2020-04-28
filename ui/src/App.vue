@@ -1,69 +1,36 @@
 <template>
   <v-app id="inspire">
+    <Notification v-bind:notification="notification"/>
+    <div v-if="this.isAuthenticated">
+      <Header/>
 
-    <v-app-bar app>
-      <img class="mr-3" :src="require('./assets/logo.png')" height="50" alt="Wg Gen Web"/>
-      <v-toolbar-title to="/">Wg Gen Web</v-toolbar-title>
+      <v-content>
+        <v-container>
+          <router-view />
+        </v-container>
+      </v-content>
 
-      <v-spacer />
-
-      <v-toolbar-items>
-        <v-btn to="/clients">
-          Clients
-          <v-icon right dark>mdi-account-network-outline</v-icon>
-        </v-btn>
-        <v-btn to="/server">
-          Server
-          <v-icon right dark>mdi-vpn</v-icon>
-        </v-btn>
-      </v-toolbar-items>
-
-    </v-app-bar>
-
-    <v-content>
-      <v-container>
-        <router-view />
-      </v-container>
-      <Notification v-bind:notification="notification"/>
-    </v-content>
-
-    <v-footer app>
-      <v-row justify="start" no-gutters>
-        <v-col cols="12" lg="6" md="12" sm="12">
-          <div :align="$vuetify.breakpoint.smAndDown ? 'center' : 'left'">
-            <small>Copyright &copy; {{ new Date().getFullYear() }}, Wg Gen Web.</small>
-            <small>This work is licensed under a <a class="pr-1 pl-1" href="http://www.wtfpl.net/" target="_blank">WTFPL License.</a></small>
-          </div>
-        </v-col>
-      </v-row>
-      <v-row justify="end" no-gutters>
-        <v-col cols="12" lg="6" md="12" sm="12">
-          <div :align="$vuetify.breakpoint.smAndDown ? 'center' : 'right'">
-            <small>Created with</small>
-            <v-icon class="pr-1 pl-1">mdi-heart</v-icon><span>by</span><a class="pr-2 pl-1" href="mailto:vx3r@127-0-0-1.fr">vx3r</a>
-            <a :href="'https://github.com/vx3r/wg-gen-web/commit/' + version"><kbd>Version: {{ version.substring(0,7) }}</kbd></a>
-          </div>
-        </v-col>
-      </v-row>
-    </v-footer>
-
+      <Footer/>
+    </div>
   </v-app>
 </template>
 
 <script>
-  import {ApiService} from "./services/ApiService";
   import Notification from './components/Notification'
+  import Header from "./components/Header";
+  import Footer from "./components/Footer";
+  import {mapActions, mapGetters} from "vuex";
 
   export default {
     name: 'App',
 
     components: {
+      Footer,
+      Header,
       Notification
     },
 
     data: () => ({
-      api: null,
-      version:'N/A',
       notification: {
         show: false,
         color: '',
@@ -71,23 +38,69 @@
       },
     }),
 
-    mounted() {
-      this.api = new ApiService();
-      this.getVersion()
+    computed:{
+      ...mapGetters({
+        isAuthenticated: 'auth/isAuthenticated',
+        authStatus: 'auth/authStatus',
+        authRedirectUrl: 'auth/authRedirectUrl',
+        authError: 'auth/error',
+        clientError: 'client/error',
+        serverError: 'server/error',
+      })
     },
 
     created () {
       this.$vuetify.theme.dark = true
     },
 
-    methods: {
-      getVersion() {
-        this.api.get('/server/version').then((res) => {
-          this.version = res.version;
-        }).catch((e) => {
-          this.notify('error', e.response.status + ' ' + e.response.statusText);
-        });
+    mounted() {
+      if (this.$route.query.code && this.$route.query.state) {
+        this.oauth2_exchange({
+          code: this.$route.query.code,
+          state: this.$route.query.state
+        })
+      } else {
+        this.oauth2_url()
+      }
+    },
+
+    watch: {
+      authError(newValue, oldValue) {
+        console.log(newValue)
+        this.notify('error', newValue);
       },
+
+      clientError(newValue, oldValue) {
+        console.log(newValue)
+        this.notify('error', newValue);
+      },
+
+      serverError(newValue, oldValue) {
+        console.log(newValue)
+        this.notify('error', newValue);
+      },
+
+      isAuthenticated(newValue, oldValue) {
+        console.log(`Updating isAuthenticated from ${oldValue} to ${newValue}`);
+        if (newValue === true) {
+          this.$router.push('/clients')
+        }
+      },
+
+      authStatus(newValue, oldValue) {
+        console.log(`Updating authStatus from ${oldValue} to ${newValue}`);
+        if (newValue === 'redirect') {
+          window.location.replace(this.authRedirectUrl)
+        }
+      },
+    },
+
+    methods: {
+      ...mapActions('auth', {
+        oauth2_exchange: 'oauth2_exchange',
+        oauth2_url: 'oauth2_url',
+      }),
+
       notify(color, msg) {
         this.notification.show = true;
         this.notification.color = color;

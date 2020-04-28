@@ -158,7 +158,7 @@
             <v-btn
                     class="ma-2"
                     color="success"
-                    :href="`${apiBaseUrl}/server/config`"
+                    v-on:click="forceFileDownload()"
             >
                 Download server configuration
                 <v-icon right dark>mdi-cloud-download-outline</v-icon>
@@ -167,52 +167,44 @@
             <v-btn
                     class="ma-2"
                     color="warning"
-                    @click="updateServer"
+                    @click="update"
             >
                 Update server configuration
                 <v-icon right dark>mdi-update</v-icon>
             </v-btn>
             <v-divider dark/>
         </v-row>
-        <Notification v-bind:notification="notification"/>
     </v-container>
 </template>
 <script>
-  import {API_BASE_URL, ApiService} from "../services/ApiService";
-  import Notification from '../components/Notification'
+  import {mapActions, mapGetters} from "vuex";
 
   export default {
     name: 'Server',
 
-    components: {
-      Notification
-    },
-
     data: () => ({
-      api: null,
-      server: null,
-      apiBaseUrl: API_BASE_URL,
-      notification: {
-        show: false,
-        color: '',
-        text: '',
-      },
+
     }),
 
+    computed:{
+      ...mapGetters({
+        server: 'server/server',
+        config: 'server/config',
+      }),
+    },
+
     mounted () {
-      this.api = new ApiService();
-      this.getServer()
+      this.readServer()
     },
 
     methods: {
-      getServer() {
-        this.api.get('/server').then((res) => {
-          this.server = res;
-        }).catch((e) => {
-          this.notify('error', e.response.status + ' ' + e.response.statusText);
-        });
-      },
-      updateServer () {
+      ...mapActions('server', {
+        errorServer: 'error',
+        readServer: 'read',
+        updateServer: 'update',
+      }),
+
+      update() {
         // convert int values
         this.server.listenPort = parseInt(this.server.listenPort, 10);
         this.server.persistentKeepalive = parseInt(this.server.persistentKeepalive, 10);
@@ -220,12 +212,12 @@
 
         // check server addresses
         if (this.server.address.length < 1) {
-          this.notify('error', 'Please provide at least one valid CIDR address for server interface');
+          this.errorServer('Please provide at least one valid CIDR address for server interface');
           return;
         }
         for (let i = 0; i < this.server.address.length; i++){
           if (this.$isCidr(this.server.address[i]) === 0) {
-            this.notify('error', `Invalid CIDR detected, please correct ${this.server.address[i]} before submitting`);
+            this.errorServer(`Invalid CIDR detected, please correct ${this.server.address[i]} before submitting`);
             return
           }
         }
@@ -233,35 +225,34 @@
         // check DNS correct
         for (let i = 0; i < this.server.dns.length; i++){
           if (this.$isCidr(this.server.dns[i] + '/32') === 0) {
-            this.notify('error', `Invalid IP detected, please correct ${this.server.dns[i]} before submitting`);
+            this.errorServer(`Invalid IP detected, please correct ${this.server.dns[i]} before submitting`);
             return
           }
         }
 
         // check client AllowedIPs
         if (this.server.allowedips.length < 1) {
-          this.notify('error', 'Please provide at least one valid CIDR address for client allowed IPs');
+          this.errorServer('Please provide at least one valid CIDR address for client allowed IPs');
           return;
         }
         for (let i = 0; i < this.server.allowedips.length; i++){
           if (this.$isCidr(this.server.allowedips[i]) === 0) {
-            this.notify('error', 'Invalid CIDR detected, please correct before submitting');
+            this.errorServer('Invalid CIDR detected, please correct before submitting');
             return
           }
         }
 
-        this.api.patch('/server', this.server).then((res) => {
-          this.notify('success', "Server successfully updated");
-          this.server = res;
-        }).catch((e) => {
-          this.notify('error', e.response.status + ' ' + e.response.statusText);
-        });
+        this.updateServer(this.server)
       },
-      notify(color, msg) {
-        this.notification.show = true;
-        this.notification.color = color;
-        this.notification.text = msg;
-      }
+
+      forceFileDownload(){
+        const url = window.URL.createObjectURL(new Blob([this.config]))
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', 'wg0.conf') //or any other extension
+        document.body.appendChild(link)
+        link.click()
+      },
     }
   };
 </script>
