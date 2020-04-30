@@ -1,136 +1,195 @@
 <template>
     <v-container>
-        <v-row>
-            <v-col cols="12">
-                <v-card dark>
-                    <v-list-item>
-                        <v-list-item-content>
-                            <v-list-item-title class="headline">Clients</v-list-item-title>
-                        </v-list-item-content>
-                        <v-btn
-                                color="success"
-                                @click="startCreate"
-                        >
-                            Add new client
-                            <v-icon right dark>mdi-account-multiple-plus-outline</v-icon>
-                        </v-btn>
-                    </v-list-item>
+        <v-card>
+            <v-card-title>
+                Clients
+                <v-switch
+                        class="ml-3"
+                        dark
+                        :label="listView ? 'Switch to card view' : 'Switch to list view'"
+                        v-model="listView"
+                />
+                <v-spacer></v-spacer>
+                <v-text-field
+                        v-if="listView"
+                        v-model="search"
+                        append-icon="mdi-magnify"
+                        label="Search"
+                        single-line
+                        hide-details
+                ></v-text-field>
+            </v-card-title>
+            <v-data-table
+                    v-if="listView"
+                    :headers="headers"
+                    :items="clients"
+                    :search="search"
+            >
+                <template v-slot:item.address="{ item }">
+                    <v-chip
+                            v-for="(ip, i) in item.address"
+                            :key="i"
+                            color="indigo"
+                            text-color="white"
+                    >
+                        <v-icon left>mdi-ip-network</v-icon>
+                        {{ ip }}
+                    </v-chip>
+                </template>
+                <template v-slot:item.created="{ item }">
                     <v-row>
-                        <v-col
-                                v-for="(client, i) in clients"
-                                :key="i"
-                                sm12 lg6
-                        >
-                            <v-card
-                                    :color="client.enable ? '#1F7087' : 'warning'"
-                                    class="mx-auto"
-                                    raised
-                                    shaped
-                            >
-                                <v-list-item>
-                                    <v-list-item-content>
-                                        <v-list-item-title class="headline">{{ client.name }}</v-list-item-title>
-                                        <v-list-item-subtitle>{{ client.email }}</v-list-item-subtitle>
-                                        <v-list-item-subtitle>Created: {{ client.created | formatDate }} by {{ client.createdBy }}</v-list-item-subtitle>
-                                        <v-list-item-subtitle>Updated: {{ client.updated | formatDate }} by {{ client.updatedBy }}</v-list-item-subtitle>
-                                    </v-list-item-content>
-
-                                    <v-list-item-avatar
-                                            tile
-                                            size="150"
-                                    >
-                                        <v-img :src="'data:image/png;base64, ' + getClientQrcode(client.id)"/>
-                                    </v-list-item-avatar>
-                                </v-list-item>
-
-                                <v-card-text class="text--primary">
-                                    <v-chip
-                                            v-for="(ip, i) in client.address"
-                                            :key="i"
-                                            color="indigo"
-                                            text-color="white"
-                                    >
-                                        <v-icon left>mdi-ip-network</v-icon>
-                                        {{ ip }}
-                                    </v-chip>
-                                </v-card-text>
-                                <v-card-actions>
-                                    <v-tooltip bottom>
-                                        <template v-slot:activator="{ on }">
-                                            <v-btn
-                                                    text
-                                                    v-on:click="forceFileDownload(client)"
-                                                    v-on="on"
-                                            >
-                                                <span class="d-none d-lg-flex">Download</span>
-                                                <v-icon right dark>mdi-cloud-download-outline</v-icon>
-                                            </v-btn>
-                                        </template>
-                                        <span>Download</span>
-                                    </v-tooltip>
-
-                                    <v-tooltip bottom>
-                                        <template v-slot:activator="{ on }">
-                                            <v-btn
-                                                    text
-                                                    @click.stop="startUpdate(client)"
-                                                    v-on="on"
-                                            >
-                                                <span class="d-none d-lg-flex">Edit</span>
-                                                <v-icon right dark>mdi-square-edit-outline</v-icon>
-                                            </v-btn>
-                                        </template>
-                                        <span>Edit</span>
-                                    </v-tooltip>
-
-                                    <v-tooltip bottom>
-                                        <template v-slot:activator="{ on }">
-                                            <v-btn
-                                                    text
-                                                    @click="remove(client)"
-                                                    v-on="on"
-                                            >
-                                                <span class="d-none d-lg-flex">Delete</span>
-                                                <v-icon right dark>mdi-trash-can-outline</v-icon>
-                                            </v-btn>
-                                        </template>
-                                        <span>Delete</span>
-                                    </v-tooltip>
-
-                                    <v-tooltip bottom>
-                                        <template v-slot:activator="{ on }">
-                                            <v-btn
-                                                    text
-                                                    @click="email(client)"
-                                                    v-on="on"
-                                            >
-                                                <span class="d-none d-lg-flex">Send Email</span>
-                                                <v-icon right dark>mdi-email-send-outline</v-icon>
-                                            </v-btn>
-                                        </template>
-                                        <span>Send Email</span>
-                                    </v-tooltip>
-                                    <v-spacer/>
-                                    <v-tooltip right>
-                                        <template v-slot:activator="{ on }">
-                                            <v-switch
-                                                    dark
-                                                    v-on="on"
-                                                    color="success"
-                                                    v-model="client.enable"
-                                                    v-on:change="update(client)"
-                                            />
-                                        </template>
-                                        <span> {{client.enable ? 'Disable' : 'Enable'}} this client</span>
-                                    </v-tooltip>
-
-                                </v-card-actions>
-                            </v-card>
-                        </v-col>
+                        <p>At {{ item.created | formatDate }} by {{ item.createdBy }}</p>
                     </v-row>
-                </v-card>
-            </v-col>
-        </v-row>
+                </template>
+                <template v-slot:item.updated="{ item }">
+                    <v-row>
+                        <p>At {{ item.updated | formatDate }} by {{ item.updatedBy }}</p>
+                    </v-row>
+                </template>
+                <template v-slot:item.action="{ item }">
+                    <v-icon
+                            class="pr-1 pl-1"
+                            @click.stop="startUpdate(item)"
+                    >
+                        mdi-square-edit-outline
+                    </v-icon>
+                    <v-icon
+                            class="pr-1 pl-1"
+                            @click.stop="forceFileDownload(item)"
+                    >
+                        mdi-cloud-download-outline
+                    </v-icon>
+                    <v-icon
+                            class="pr-1 pl-1"
+                            @click.stop="email(item)"
+                    >
+                        mdi-email-send-outline
+                    </v-icon>
+                    <v-icon
+                            class="pr-1 pl-1"
+                            @click="remove(item)"
+                    >
+                        mdi-trash-can-outline
+                    </v-icon>
+                </template>
+
+            </v-data-table>
+            <v-card-text v-else>
+                <v-row>
+                    <v-col
+                            v-for="(client, i) in clients"
+                            :key="i"
+                            sm12 lg6
+                    >
+                        <v-card
+                                :color="client.enable ? '#1F7087' : 'warning'"
+                                class="mx-auto"
+                                raised
+                                shaped
+                        >
+                            <v-list-item>
+                                <v-list-item-content>
+                                    <v-list-item-title class="headline">{{ client.name }}</v-list-item-title>
+                                    <v-list-item-subtitle>{{ client.email }}</v-list-item-subtitle>
+                                    <v-list-item-subtitle>Created: {{ client.created | formatDate }} by {{ client.createdBy }}</v-list-item-subtitle>
+                                    <v-list-item-subtitle>Updated: {{ client.updated | formatDate }} by {{ client.updatedBy }}</v-list-item-subtitle>
+                                </v-list-item-content>
+
+                                <v-list-item-avatar
+                                        tile
+                                        size="150"
+                                >
+                                    <v-img :src="'data:image/png;base64, ' + getClientQrcode(client.id)"/>
+                                </v-list-item-avatar>
+                            </v-list-item>
+
+                            <v-card-text class="text--primary">
+                                <v-chip
+                                        v-for="(ip, i) in client.address"
+                                        :key="i"
+                                        color="indigo"
+                                        text-color="white"
+                                >
+                                    <v-icon left>mdi-ip-network</v-icon>
+                                    {{ ip }}
+                                </v-chip>
+                            </v-card-text>
+                            <v-card-actions>
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on }">
+                                        <v-btn
+                                                text
+                                                v-on:click="forceFileDownload(client)"
+                                                v-on="on"
+                                        >
+                                            <span class="d-none d-lg-flex">Download</span>
+                                            <v-icon right dark>mdi-cloud-download-outline</v-icon>
+                                        </v-btn>
+                                    </template>
+                                    <span>Download</span>
+                                </v-tooltip>
+
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on }">
+                                        <v-btn
+                                                text
+                                                @click.stop="startUpdate(client)"
+                                                v-on="on"
+                                        >
+                                            <span class="d-none d-lg-flex">Edit</span>
+                                            <v-icon right dark>mdi-square-edit-outline</v-icon>
+                                        </v-btn>
+                                    </template>
+                                    <span>Edit</span>
+                                </v-tooltip>
+
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on }">
+                                        <v-btn
+                                                text
+                                                @click="remove(client)"
+                                                v-on="on"
+                                        >
+                                            <span class="d-none d-lg-flex">Delete</span>
+                                            <v-icon right dark>mdi-trash-can-outline</v-icon>
+                                        </v-btn>
+                                    </template>
+                                    <span>Delete</span>
+                                </v-tooltip>
+
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on }">
+                                        <v-btn
+                                                text
+                                                @click="email(client)"
+                                                v-on="on"
+                                        >
+                                            <span class="d-none d-lg-flex">Send Email</span>
+                                            <v-icon right dark>mdi-email-send-outline</v-icon>
+                                        </v-btn>
+                                    </template>
+                                    <span>Send Email</span>
+                                </v-tooltip>
+                                <v-spacer/>
+                                <v-tooltip right>
+                                    <template v-slot:activator="{ on }">
+                                        <v-switch
+                                                dark
+                                                v-on="on"
+                                                color="success"
+                                                v-model="client.enable"
+                                                v-on:change="update(client)"
+                                        />
+                                    </template>
+                                    <span> {{client.enable ? 'Disable' : 'Enable'}} this client</span>
+                                </v-tooltip>
+
+                            </v-card-actions>
+                        </v-card>
+                    </v-col>
+                </v-row>
+            </v-card-text>
+        </v-card>
         <v-dialog
                 v-if="client"
                 v-model="dialogCreate"
@@ -332,10 +391,21 @@
     name: 'Clients',
 
     data: () => ({
+      listView: false,
       dialogCreate: false,
       dialogUpdate: false,
       client: null,
       valid: false,
+      search: '',
+      headers: [
+        { text: 'Name', value: 'name', },
+        { text: 'Email', value: 'email', },
+        { text: 'IP addresses', value: 'address', },
+        { text: 'Created', value: 'created', sortable: false, },
+        { text: 'Updated', value: 'updated', sortable: false, },
+        { text: 'Actions', value: 'action', sortable: false, },
+
+      ],
     }),
 
     computed:{

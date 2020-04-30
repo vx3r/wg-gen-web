@@ -74,15 +74,6 @@ func (o *Oauth2idc) UserInfo(oauth2Token *oauth2.Token) (*model.User, error) {
 		return nil, err
 	}
 
-	type UserInfo struct {
-		Subject       string `json:"sub"`
-		Profile       string `json:"profile"`
-		Email         string `json:"email"`
-		EmailVerified bool   `json:"email_verified"`
-
-		claims []byte
-	}
-
 	// ID Token payload is just JSON
 	var claims map[string]interface{}
 	if err := userInfo.Claims(&claims); err != nil {
