@@ -3,11 +3,9 @@
         <v-row>
             <v-col cols="12">
                 <v-card dark>
-                    <v-list-item>
-                        <v-list-item-content>
-                            <v-list-item-title class="headline">Server's interface configuration</v-list-item-title>
-                        </v-list-item-content>
-                    </v-list-item>
+                    <v-card-title>
+                        Server's interface configuration
+                    </v-card-title>
                     <div class="d-flex flex-no-wrap justify-space-between">
                         <v-col cols="12">
                             <v-text-field
@@ -50,11 +48,17 @@
             </v-col>
             <v-col cols="12">
                 <v-card dark>
-                    <v-list-item>
-                        <v-list-item-content>
-                            <v-list-item-title class="headline">Client's global configuration</v-list-item-title>
-                        </v-list-item-content>
-                    </v-list-item>
+                    <v-card-title>
+                        Client's global configuration
+                        <v-spacer></v-spacer>
+                        <v-btn
+                                color="warning"
+                                @click="applyGlobals"
+                        >
+                            Apply globals to all clients
+                            <v-icon right dark>mdi-update</v-icon>
+                        </v-btn>
+                    </v-card-title>
                     <div class="d-flex flex-no-wrap justify-space-between">
                         <v-col cols="12">
                             <v-text-field
@@ -125,11 +129,9 @@
         <v-row>
             <v-col cols="12">
                 <v-card dark>
-                    <v-list-item>
-                        <v-list-item-content>
-                            <v-list-item-title class="headline">Interface configuration hooks</v-list-item-title>
-                        </v-list-item-content>
-                    </v-list-item>
+                    <v-card-title>
+                        Interface configuration hooks
+                    </v-card-title>
                     <div class="d-flex flex-no-wrap justify-space-between">
                         <v-col cols="12">
                             <v-text-field
@@ -190,6 +192,7 @@
       ...mapGetters({
         server: 'server/server',
         config: 'server/config',
+        clients: 'client/clients',
       }),
     },
 
@@ -203,6 +206,19 @@
         readServer: 'read',
         updateServer: 'update',
       }),
+
+      ...mapActions('client', {
+        updateClient: 'update',
+      }),
+
+      applyGlobals(){
+        this.update()
+
+        this.clients.forEach(client => {
+          client.allowedips = this.server.allowedips
+          this.updateClient(client)
+        })
+      },
 
       update() {
         // convert int values
