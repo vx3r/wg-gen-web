@@ -11,8 +11,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/api"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/auth"
-	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/auth/fake"
-	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/auth/oauth2oidc"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/core"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/util"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/version"
@@ -20,6 +18,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -106,45 +105,14 @@ func main() {
 	// serve static files
 	app.Use(static.Serve("/", static.LocalFile("./ui/dist", false)))
 
-	// setup Oauth2 client if enabled
-	var oauth2Client auth.Auth
-
-	switch os.Getenv("OAUTH2_PROVIDER_NAME") {
-	case "fake":
-		log.Warn("Oauth is set to fake, no actual authentication will be performed")
-		oauth2Client = &fake.Fake{}
-		err = oauth2Client.Setup()
-		if err != nil {
-			log.WithFields(log.Fields{
-				"OAUTH2_PROVIDER_NAME": "oauth2oidc",
-				"err":                  err,
-			}).Fatal("failed to setup Oauth2")
-		}
-	case "oauth2oidc":
-		log.Warn("Oauth is set to oauth2oidc, must be RFC implementation on server side")
-		oauth2Client = &oauth2oidc.Oauth2idc{}
-		err = oauth2Client.Setup()
-		if err != nil {
-			log.WithFields(log.Fields{
-				"OAUTH2_PROVIDER_NAME": "oauth2oidc",
-				"err":                  err,
-			}).Fatal("failed to setup Oauth2")
-		}
-	default:
+	// setup Oauth2 client
+	oauth2Client, err := auth.GetAuthProvider()
+	if err != nil {
 		log.WithFields(log.Fields{
-			"OAUTH2_PROVIDER_NAME": os.Getenv("OAUTH2_PROVIDER_NAME"),
-		}).Fatal("auth provider name unknown")
+			"err": err,
+		}).Fatal("failed to setup Oauth2")
 	}
 
-	if os.Getenv("OAUTH2_ENABLE") == "true" {
-		oauth2Client = &oauth2oidc.Oauth2idc{}
-		err = oauth2Client.Setup()
-		if err != nil {
-			log.WithFields(log.Fields{
-				"err": err,
-			}).Fatal("failed to setup Oauth2")
-		}
-	}
 	app.Use(func(ctx *gin.Context) {
 		ctx.Set("oauth2Client", oauth2Client)
 		ctx.Next()
@@ -164,6 +132,12 @@ func main() {
 			// will be accessible in auth endpoints
 			c.Set("oauth2Token", oauth2Token)
 			c.Next()
+			return
+		}
+
+		// avoid 401 page for refresh after logout
+		if !strings.Contains(c.Request.URL.Path, "/api/") {
+			c.Redirect(301, "/index.html")
 			return
 		}
 
