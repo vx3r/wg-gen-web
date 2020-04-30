@@ -18,6 +18,14 @@
                         single-line
                         hide-details
                 ></v-text-field>
+                <v-spacer></v-spacer>
+                <v-btn
+                        color="success"
+                        @click="startCreate"
+                >
+                    Add new client
+                    <v-icon right dark>mdi-account-multiple-plus-outline</v-icon>
+                </v-btn>
             </v-card-title>
             <v-data-table
                     v-if="listView"
