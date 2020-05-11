@@ -31,6 +31,8 @@ The goal is to run Wg Gen Web in a container and WireGuard on host system.
  * Sent email to client with QR-code and client config
  * Enable / Disable client
  * Generation of `wg0.conf` after any modification
+ * IPv6 ready
+ * User authentication (Oauth2 OIDC)
  * Dockerized
  * Pretty cool look
 
@@ -44,24 +46,28 @@ The easiest way to run Wg Gen Web is using the container image
 ```
 docker run --rm -it -v /tmp/wireguard:/data -p 8080:8080 -e "WG_CONF_DIR=/data" vx3r/wg-gen-web:latest
 ```
-Docker compose snippet
+Docker compose snippet, used for demo server
 ```
 version: '3.6'
-services:
-  wg-gen-web:
+  wg-gen-web-demo:
     image: vx3r/wg-gen-web:latest
-    container_name: wg-gen-web
+    container_name: wg-gen-web-demo
     restart: unless-stopped
-    ports:
-      - 8080:8080
+    expose:
+      - "8080/tcp"
     environment:
       - WG_CONF_DIR=/data
       - WG_INTERFACE_NAME=wg0.conf
       - SMTP_HOST=smtp.gmail.com
       - SMTP_PORT=587
-      - SMTP_USERNAME=account@gmail.com
-      - SMTP_PASSWORD="*************"
-      - SMTP_FROM=Wg Gen Web <account@gmail.com>
+      - SMTP_USERNAME=no-reply@gmail.com
+      - SMTP_PASSWORD=******************
+      - SMTP_FROM=Wg Gen Web <no-reply@gmail.com>
+      - OAUTH2_PROVIDER_NAME=github
+      - OAUTH2_PROVIDER=https://github.com
+      - OAUTH2_CLIENT_ID=******************
+      - OAUTH2_CLIENT_SECRET=******************
+      - OAUTH2_REDIRECT_URL=https://wg-gen-web-demo.127-0-0-1.fr
     volumes:
       - /etc/wireguard:/data
 ```
@@ -130,10 +136,49 @@ Feel free to modify this file in order to use your existing keys
  * Generation or application of any `iptables` or `nftables` rules
  * Application of configuration to WireGuard by Wg Gen Web itself
 
-## TODO
+## Authentication
 
- * Multi-user support behind [Authelia](https://github.com/authelia/authelia) (suggestions / thoughts are welcome)
- * ~~Send configs by email to client~~
+Wg Gen Web can use Oauth2 OpenID Connect provider to authenticate users.
+Currently there are 4 implementations:
+- `fake` not a real implementation, use this if you don't want to authenticate your clients.
+
+Add the environment variable:
+
+```
+OAUTH2_PROVIDER_NAME=fake
+```
+
+- `github` in order to use GitHub as Oauth2 provider.
+
+Add the environment variable:
+
+```
+OAUTH2_PROVIDER_NAME=github
+OAUTH2_PROVIDER=https://github.com
+OAUTH2_CLIENT_ID=********************
+OAUTH2_CLIENT_SECRET=********************
+OAUTH2_REDIRECT_URL=https://wg-gen-web-demo.127-0-0-1.fr
+```
+
+- `google` in order to use Google as Oauth2 provider. Not yet implemented
+```
+help wanted
+```
+
+- `oauth2oidc` in order to use RFC compliant Oauth2 OpenId Connect provider.
+
+Add the environment variable:
+
+```
+OAUTH2_PROVIDER_NAME=oauth2oidc
+OAUTH2_PROVIDER=https://gitlab.com
+OAUTH2_CLIENT_ID=********************
+OAUTH2_CLIENT_SECRET=********************
+OAUTH2_REDIRECT_URL=https://wg-gen-web-demo.127-0-0-1.fr
+```
+
+Please fell free to test and report any bugs.
+Wg Gen Web will only access your profile to get email address and your name, no other unnecessary scopes will be requested.
 
 ## Need Help
 
