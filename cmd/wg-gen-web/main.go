@@ -90,7 +90,7 @@ func main() {
 	// cors middleware
 	config := cors.DefaultConfig()
 	config.AllowAllOrigins = true
-	config.AddAllowHeaders("Authorization")
+	config.AddAllowHeaders("Authorization", util.AuthTokenHeaderName)
 	app.Use(cors.New(config))
 
 	// protection middleware

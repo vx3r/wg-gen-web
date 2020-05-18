@@ -4,7 +4,7 @@ import TokenService from "./token.service";
 const ApiService = {
 
   setHeader() {
-    Vue.axios.defaults.headers.common.Authorization = `${TokenService.getToken()}`;
+    Vue.axios.defaults.headers['x-wg-gen-web-auth'] = `${TokenService.getToken()}`;
   },
 
   get(resource) {
