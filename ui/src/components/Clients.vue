@@ -44,6 +44,17 @@
                         {{ ip }}
                     </v-chip>
                 </template>
+                <template v-slot:item.tags="{ item }">
+                    <v-chip
+                            v-for="(tag, i) in item.tags"
+                            :key="i"
+                            color="blue-grey"
+                            text-color="white"
+                    >
+                        <v-icon left>mdi-tag</v-icon>
+                        {{ tag }}
+                    </v-chip>
+                </template>
                 <template v-slot:item.created="{ item }">
                     <v-row>
                         <p>At {{ item.created | formatDate }} by {{ item.createdBy }}</p>
@@ -120,6 +131,17 @@
                                 >
                                     <v-icon left>mdi-ip-network</v-icon>
                                     {{ ip }}
+                                </v-chip>
+                            </v-card-text>
+                            <v-card-text class="text--primary">
+                                <v-chip
+                                        v-for="(tag, i) in client.tags"
+                                        :key="i"
+                                        color="blue-grey"
+                                        text-color="white"
+                                >
+                                    <v-icon left>mdi-tag</v-icon>
+                                    {{ tag }}
                                 </v-chip>
                             </v-card-text>
                             <v-card-actions>
@@ -448,6 +470,7 @@
         { text: 'Name', value: 'name', },
         { text: 'Email', value: 'email', },
         { text: 'IP addresses', value: 'address', },
+        { text: 'Tags', value: 'tags', },
         { text: 'Created', value: 'created', sortable: false, },
         { text: 'Updated', value: 'updated', sortable: false, },
         { text: 'Actions', value: 'action', sortable: false, },
