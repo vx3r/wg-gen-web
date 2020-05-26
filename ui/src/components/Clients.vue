@@ -255,7 +255,26 @@
                                         </v-chip>
                                     </template>
                                 </v-combobox>
-
+                                <v-combobox
+                                        v-model="client.tags"
+                                        chips
+                                        hint="Write tag name and hit enter"
+                                        label="Tags"
+                                        multiple
+                                        dark
+                                >
+                                    <template v-slot:selection="{ attrs, item, select, selected }">
+                                        <v-chip
+                                                v-bind="attrs"
+                                                :input-value="selected"
+                                                close
+                                                @click="select"
+                                                @click:close="client.tags.splice(client.tags.indexOf(item), 1)"
+                                        >
+                                            <strong>{{ item }}</strong>&nbsp;
+                                        </v-chip>
+                                    </template>
+                                </v-combobox>
                                 <v-switch
                                         v-model="client.enable"
                                         color="red"
@@ -360,6 +379,26 @@
                                         </v-chip>
                                     </template>
                                 </v-combobox>
+                                <v-combobox
+                                        v-model="client.tags"
+                                        chips
+                                        hint="Write tag name and hit enter"
+                                        label="Tags"
+                                        multiple
+                                        dark
+                                >
+                                    <template v-slot:selection="{ attrs, item, select, selected }">
+                                        <v-chip
+                                                v-bind="attrs"
+                                                :input-value="selected"
+                                                close
+                                                @click="select"
+                                                @click:close="client.tags.splice(client.tags.indexOf(item), 1)"
+                                        >
+                                            <strong>{{ item }}</strong>&nbsp;
+                                        </v-chip>
+                                    </template>
+                                </v-combobox>
                                 <v-switch
                                         v-model="client.ignorePersistentKeepalive"
                                         color="red"
@@ -451,6 +490,7 @@
           enable: true,
           allowedIPs: this.server.allowedips,
           address: this.server.address,
+          tags: [],
         }
         this.dialogCreate = true;
       },
