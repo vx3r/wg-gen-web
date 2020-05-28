@@ -16,6 +16,7 @@ type Client struct {
 	PresharedKey              string    `json:"presharedKey"`
 	AllowedIPs                []string  `json:"allowedIPs"`
 	Address                   []string  `json:"address"`
+	Tags											[]string  `json:"tags"`
 	PrivateKey                string    `json:"privateKey"`
 	PublicKey                 string    `json:"publicKey"`
 	CreatedBy                 string    `json:"createdBy"`

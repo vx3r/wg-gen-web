@@ -44,6 +44,17 @@
                         {{ ip }}
                     </v-chip>
                 </template>
+                <template v-slot:item.tags="{ item }">
+                    <v-chip
+                            v-for="(tag, i) in item.tags"
+                            :key="i"
+                            color="blue-grey"
+                            text-color="white"
+                    >
+                        <v-icon left>mdi-tag</v-icon>
+                        {{ tag }}
+                    </v-chip>
+                </template>
                 <template v-slot:item.created="{ item }">
                     <v-row>
                         <p>At {{ item.created | formatDate }} by {{ item.createdBy }}</p>
@@ -120,6 +131,17 @@
                                 >
                                     <v-icon left>mdi-ip-network</v-icon>
                                     {{ ip }}
+                                </v-chip>
+                            </v-card-text>
+                            <v-card-text class="text--primary">
+                                <v-chip
+                                        v-for="(tag, i) in client.tags"
+                                        :key="i"
+                                        color="blue-grey"
+                                        text-color="white"
+                                >
+                                    <v-icon left>mdi-tag</v-icon>
+                                    {{ tag }}
                                 </v-chip>
                             </v-card-text>
                             <v-card-actions>
@@ -255,7 +277,26 @@
                                         </v-chip>
                                     </template>
                                 </v-combobox>
-
+                                <v-combobox
+                                        v-model="client.tags"
+                                        chips
+                                        hint="Write tag name and hit enter"
+                                        label="Tags"
+                                        multiple
+                                        dark
+                                >
+                                    <template v-slot:selection="{ attrs, item, select, selected }">
+                                        <v-chip
+                                                v-bind="attrs"
+                                                :input-value="selected"
+                                                close
+                                                @click="select"
+                                                @click:close="client.tags.splice(client.tags.indexOf(item), 1)"
+                                        >
+                                            <strong>{{ item }}</strong>&nbsp;
+                                        </v-chip>
+                                    </template>
+                                </v-combobox>
                                 <v-switch
                                         v-model="client.enable"
                                         color="red"
@@ -360,6 +401,26 @@
                                         </v-chip>
                                     </template>
                                 </v-combobox>
+                                <v-combobox
+                                        v-model="client.tags"
+                                        chips
+                                        hint="Write tag name and hit enter"
+                                        label="Tags"
+                                        multiple
+                                        dark
+                                >
+                                    <template v-slot:selection="{ attrs, item, select, selected }">
+                                        <v-chip
+                                                v-bind="attrs"
+                                                :input-value="selected"
+                                                close
+                                                @click="select"
+                                                @click:close="client.tags.splice(client.tags.indexOf(item), 1)"
+                                        >
+                                            <strong>{{ item }}</strong>&nbsp;
+                                        </v-chip>
+                                    </template>
+                                </v-combobox>
                                 <v-switch
                                         v-model="client.ignorePersistentKeepalive"
                                         color="red"
@@ -409,6 +470,7 @@
         { text: 'Name', value: 'name', },
         { text: 'Email', value: 'email', },
         { text: 'IP addresses', value: 'address', },
+        { text: 'Tags', value: 'tags', },
         { text: 'Created', value: 'created', sortable: false, },
         { text: 'Updated', value: 'updated', sortable: false, },
         { text: 'Actions', value: 'action', sortable: false, },
@@ -451,6 +513,7 @@
           enable: true,
           allowedIPs: this.server.allowedips,
           address: this.server.address,
+          tags: [],
         }
         this.dialogCreate = true;
       },
