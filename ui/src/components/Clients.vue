@@ -66,30 +66,39 @@
                     </v-row>
                 </template>
                 <template v-slot:item.action="{ item }">
-                    <v-icon
-                            class="pr-1 pl-1"
-                            @click.stop="startUpdate(item)"
-                    >
-                        mdi-square-edit-outline
-                    </v-icon>
-                    <v-icon
-                            class="pr-1 pl-1"
-                            @click.stop="forceFileDownload(item)"
-                    >
-                        mdi-cloud-download-outline
-                    </v-icon>
-                    <v-icon
-                            class="pr-1 pl-1"
-                            @click.stop="email(item)"
-                    >
-                        mdi-email-send-outline
-                    </v-icon>
-                    <v-icon
-                            class="pr-1 pl-1"
-                            @click="remove(item)"
-                    >
-                        mdi-trash-can-outline
-                    </v-icon>
+                    <v-row>
+                        <v-icon
+                                class="pr-1 pl-1"
+                                @click.stop="startUpdate(item)"
+                        >
+                            mdi-square-edit-outline
+                        </v-icon>
+                        <v-icon
+                                class="pr-1 pl-1"
+                                @click.stop="forceFileDownload(item)"
+                        >
+                            mdi-cloud-download-outline
+                        </v-icon>
+                        <v-icon
+                                class="pr-1 pl-1"
+                                @click.stop="email(item)"
+                        >
+                            mdi-email-send-outline
+                        </v-icon>
+                        <v-icon
+                                class="pr-1 pl-1"
+                                @click="remove(item)"
+                        >
+                            mdi-trash-can-outline
+                        </v-icon>
+                        <v-switch
+                                dark
+                                class="pr-1 pl-1"
+                                color="success"
+                                v-model="item.enable"
+                                v-on:change="update(item)"
+                        />
+                    </v-row>
                 </template>
 
             </v-data-table>
@@ -592,7 +601,7 @@
         const url = window.URL.createObjectURL(new Blob([config]))
         const link = document.createElement('a')
         link.href = url
-        link.setAttribute('download', 'wg0.conf') //or any other extension
+        link.setAttribute('download', client.name.split(' ').join('-') + '.conf') //or any other extension
         document.body.appendChild(link)
         link.click()
       },
