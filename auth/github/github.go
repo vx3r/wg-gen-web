@@ -13,6 +13,7 @@ import (
 	"time"
 )
 
+// Github in order to implement interface, struct is required
 type Github struct{}
 
 var (

@@ -5,6 +5,7 @@ import (
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/api/v1"
 )
 
+// ApplyRoutes apply routes to gin engine
 func ApplyRoutes(r *gin.Engine, private bool) {
 	api := r.Group("/api")
 	{

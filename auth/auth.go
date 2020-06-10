@@ -11,6 +11,7 @@ import (
 	"os"
 )
 
+// Auth interface to implement as auth provider
 type Auth interface {
 	Setup() error
 	CodeUrl(state string) string
@@ -18,6 +19,7 @@ type Auth interface {
 	UserInfo(oauth2Token *oauth2.Token) (*model.User, error)
 }
 
+// GetAuthProvider  get an instance of auth provider based on config
 func GetAuthProvider() (Auth, error) {
 	var oauth2Client Auth
 	var err error

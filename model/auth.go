@@ -1,5 +1,6 @@
 package model
 
+// Auth structure
 type Auth struct {
 	Oauth2   bool   `json:"oauth2"`
 	ClientId string `json:"clientId"`

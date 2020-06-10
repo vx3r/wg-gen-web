@@ -2,6 +2,7 @@ package model
 
 import "time"
 
+// User structure
 type User struct {
 	Sub      string    `json:"sub"`
 	Name     string    `json:"name"`

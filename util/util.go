@@ -11,6 +11,7 @@ import (
 )
 
 var (
+	// AuthTokenHeaderName http header for token transport
 	AuthTokenHeaderName = "x-wg-gen-web-auth"
 	// RegexpEmail check valid email
 	RegexpEmail = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")

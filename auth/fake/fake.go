@@ -7,6 +7,7 @@ import (
 	"time"
 )
 
+// Fake in order to implement interface, struct is required
 type Fake struct{}
 
 // Setup validate provider

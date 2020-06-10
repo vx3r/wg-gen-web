@@ -16,8 +16,8 @@ import (
 func ApplyRoutes(r *gin.RouterGroup) {
 	g := r.Group("/auth")
 	{
-		g.GET("/oauth2_url", oauth2_url)
-		g.POST("/oauth2_exchange", oauth2_exchange)
+		g.GET("/oauth2_url", oauth2URL)
+		g.POST("/oauth2_exchange", oauth2Exchange)
 		g.GET("/user", user)
 		g.GET("/logout", logout)
 	}
@@ -26,7 +26,7 @@ func ApplyRoutes(r *gin.RouterGroup) {
 /*
  * generate redirect url to get OAuth2 code or let client know that OAuth2 is disabled
  */
-func oauth2_url(c *gin.Context) {
+func oauth2URL(c *gin.Context) {
 	cacheDb := c.MustGet("cache").(*cache.Cache)
 
 	state, err := util.GenerateRandomString(32)
@@ -62,7 +62,7 @@ func oauth2_url(c *gin.Context) {
 /*
  * exchange code and get user infos, if OAuth2 is disable just send fake data
  */
-func oauth2_exchange(c *gin.Context) {
+func oauth2Exchange(c *gin.Context) {
 	var loginVals model.Auth
 	if err := c.ShouldBind(&loginVals); err != nil {
 		log.WithFields(log.Fields{

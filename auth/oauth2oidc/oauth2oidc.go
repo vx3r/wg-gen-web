@@ -10,6 +10,7 @@ import (
 	"os"
 )
 
+// Oauth2idc in order to implement interface, struct is required
 type Oauth2idc struct{}
 
 var (
