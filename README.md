@@ -49,12 +49,13 @@ docker run --rm -it -v /tmp/wireguard:/data -p 8080:8080 -e "WG_CONF_DIR=/data" 
 Docker compose snippet, used for demo server
 ```
 version: '3.6'
+services:
   wg-gen-web-demo:
     image: vx3r/wg-gen-web:latest
     container_name: wg-gen-web-demo
     restart: unless-stopped
-    expose:
-      - "8080/tcp"
+    ports:
+      - "8080:8080"
     environment:
       - WG_CONF_DIR=/data
       - WG_INTERFACE_NAME=wg0.conf
