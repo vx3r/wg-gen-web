@@ -6,7 +6,6 @@ import (
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/auth"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/core"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/model"
-	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/template"
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/version"
 	"golang.org/x/oauth2"
 	"net/http"
@@ -74,30 +73,12 @@ func updateServer(c *gin.Context) {
 }
 
 func configServer(c *gin.Context) {
-	clients, err := core.ReadClients()
+	configData, err := core.ReadWgConfigFile()
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,
-		}).Error("failed to read clients")
-		c.AbortWithStatus(http.StatusUnprocessableEntity)
-		return
-	}
-
-	server, err := core.ReadServer()
-	if err != nil {
-		log.WithFields(log.Fields{
-			"err": err,
-		}).Error("failed to read server")
-		c.AbortWithStatus(http.StatusUnprocessableEntity)
-		return
-	}
-
-	configData, err := template.DumpServerWg(clients, server)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"err": err,
-		}).Error("failed to dump wg config")
-		c.AbortWithStatus(http.StatusUnprocessableEntity)
+		}).Error("failed to read wg config file")
+		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
 

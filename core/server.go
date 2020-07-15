@@ -168,3 +168,8 @@ func GetAllReservedIps() ([]string, error) {
 
 	return reserverIps, nil
 }
+
+// ReadWgConfigFile return content of wireguard config file
+func ReadWgConfigFile() ([]byte, error) {
+	return util.ReadFile(filepath.Join(os.Getenv("WG_CONF_DIR"), os.Getenv("WG_INTERFACE_NAME")))
+}
