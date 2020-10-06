@@ -2,6 +2,7 @@ package status
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
@@ -12,9 +13,14 @@ import (
 func ApplyRoutes(r *gin.RouterGroup) {
 	g := r.Group("/status")
 	{
+		g.GET("/enabled", readEnabled)
 		g.GET("/interface", readInterfaceStatus)
 		g.GET("/clients", readClientStatus)
 	}
+}
+
+func readEnabled(c *gin.Context) {
+	c.JSON(http.StatusOK, os.Getenv("WG_STATS_API") != "")
 }
 
 func readInterfaceStatus(c *gin.Context) {

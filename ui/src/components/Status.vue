@@ -80,7 +80,8 @@
             <v-card-title>
               No stats available...
             </v-card-title>
-            <v-card-text>{{ error }}</v-card-text>
+            <v-card-text v-if="enabled">{{ error }}</v-card-text>
+            <v-card-text v-else>Status API integration not configured.</v-card-text>
           </v-card>
         </v-col>
       </v-row>
@@ -109,26 +110,32 @@
       ...mapGetters({
         interface: 'status/interfaceStatus',
         clients: 'status/clientStatus',
+        enabled: 'status/enabled',
         error: 'status/error',
       }),
       dataLoaded: function () {
-        return this.interface != null && this.interface.name !== "";
+        return this.enabled && this.interface != null && this.interface.name !== "";
       }
     },
 
     mounted () {
-      this.readStatus()
+      this.readEnabled()
+      if(this.enabled) {
+        this.readStatus()
+      }
     },
 
     methods: {
       ...mapActions('status', {
         readStatus: 'read',
+        readEnabled: 'isEnabled',
       }),
 
       reload() {
         this.readStatus()
       },
 
+      // https://stackoverflow.com/questions/10420352/converting-file-size-in-bytes-to-human-readable-string
       humanFileSize(bytes, si=false, dp=1) {
         const thresh = si ? 1000 : 1024;
 

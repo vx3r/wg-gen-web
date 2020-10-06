@@ -2,6 +2,7 @@ import ApiService from "../../services/api.service";
 
 const state = {
   error: null,
+  enabled: false,
   interfaceStatus: null,
   clientStatus: [],
   version: '_ci_build_not_run_properly_',
@@ -10,6 +11,10 @@ const state = {
 const getters = {
   error(state) {
     return state.error;
+  },
+
+  enabled(state) {
+    return state.enabled;
   },
 
   interfaceStatus(state) {
@@ -48,11 +53,26 @@ const actions = {
         commit('error', err)
       });
   },
+
+  isEnabled({ commit }){
+    ApiService.get("/status/enabled")
+      .then(resp => {
+        commit('enabled', resp)
+      })
+      .catch(err => {
+        commit('enabled', false);
+        commit('error', err.response.data)
+      });
+  },
 }
 
 const mutations = {
   error(state, error) {
     state.error = error;
+  },
+
+  enabled(state, enabled) {
+    state.enabled = enabled;
   },
 
   interfaceStatus(state, interfaceStatus){
