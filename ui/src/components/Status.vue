@@ -125,6 +125,14 @@
       }
     },
 
+    watch: {
+      enabled(newValue, oldValue) {
+        if (this.enabled) {
+          this.readStatus()
+        }
+      },
+    },
+
     methods: {
       ...mapActions('status', {
         readStatus: 'read',
