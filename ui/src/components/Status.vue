@@ -44,9 +44,19 @@
               :items="clients"
               :search="search"
           >
-            <template v-slot:item.address="{ item }">
+            <template v-slot:item.connected="{ item }">
+              <v-icon left v-if="item.connected" color="success">mdi-lan-connect</v-icon>
+              <v-icon left v-else>mdi-lan-disconnect</v-icon>
+            </template>
+            <template v-slot:item.receivedBytes="{ item }">
+              {{ humanFileSize(item.receivedBytes) }}
+            </template>
+            <template v-slot:item.transmittedBytes="{ item }">
+              {{ humanFileSize(item.transmittedBytes) }}
+            </template>
+            <template v-slot:item.allowedIPs="{ item }">
               <v-chip
-                  v-for="(ip, i) in item.address"
+                  v-for="(ip, i) in item.allowedIPs"
                   :key="i"
                   color="indigo"
                   text-color="white"
@@ -55,63 +65,11 @@
                 {{ ip }}
               </v-chip>
             </template>
-            <template v-slot:item.tags="{ item }">
-              <v-chip
-                  v-for="(tag, i) in item.tags"
-                  :key="i"
-                  color="blue-grey"
-                  text-color="white"
-              >
-                <v-icon left>mdi-tag</v-icon>
-                {{ tag }}
-              </v-chip>
-            </template>
-            <template v-slot:item.created="{ item }">
+            <template v-slot:item.lastHandshake="{ item }">
               <v-row>
-                <p>At {{ item.created | formatDate }} by {{ item.createdBy }}</p>
+                <p>{{ item.lastHandshake | formatDate }} ({{ item.lastHandshakeRelative }})</p>
               </v-row>
             </template>
-            <template v-slot:item.updated="{ item }">
-              <v-row>
-                <p>At {{ item.updated | formatDate }} by {{ item.updatedBy }}</p>
-              </v-row>
-            </template>
-            <template v-slot:item.action="{ item }">
-              <v-row>
-                <v-icon
-                    class="pr-1 pl-1"
-                    @click.stop="startUpdate(item)"
-                >
-                  mdi-square-edit-outline
-                </v-icon>
-                <v-icon
-                    class="pr-1 pl-1"
-                    @click.stop="forceFileDownload(item)"
-                >
-                  mdi-cloud-download-outline
-                </v-icon>
-                <v-icon
-                    class="pr-1 pl-1"
-                    @click.stop="email(item)"
-                >
-                  mdi-email-send-outline
-                </v-icon>
-                <v-icon
-                    class="pr-1 pl-1"
-                    @click="remove(item)"
-                >
-                  mdi-trash-can-outline
-                </v-icon>
-                <v-switch
-                    dark
-                    class="pr-1 pl-1"
-                    color="success"
-                    v-model="item.enable"
-                    v-on:change="update(item)"
-                />
-              </v-row>
-            </template>
-
           </v-data-table>
           </v-card>
         </v-col>
@@ -170,6 +128,28 @@
       reload() {
         this.readStatus()
       },
+
+      humanFileSize(bytes, si=false, dp=1) {
+        const thresh = si ? 1000 : 1024;
+
+        if (Math.abs(bytes) < thresh) {
+          return bytes + ' B';
+        }
+
+        const units = si
+            ? ['kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+            : ['KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
+        let u = -1;
+        const r = 10**dp;
+
+        do {
+          bytes /= thresh;
+          ++u;
+        } while (Math.round(Math.abs(bytes) * r) / r >= thresh && u < units.length - 1);
+
+
+        return bytes.toFixed(dp) + ' ' + units[u];
+      }
     }
   };
 </script>

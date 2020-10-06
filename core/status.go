@@ -3,6 +3,7 @@ package core
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -34,6 +35,10 @@ type apiResponse struct {
 
 func fetchWireGuardAPI(reqData apiRequest) (*apiResponse, error) {
 	apiUrl := os.Getenv("WG_STATS_API")
+	if apiUrl == "" {
+		return nil, errors.New("Status API integration not configured")
+	}
+
 	apiClient := http.Client{
 		Timeout: time.Second * 2, // Timeout after 2 seconds
 	}
@@ -135,19 +140,22 @@ func ReadClientStatus() ([]*model.ClientStatus, error) {
 		for i, peerIP := range peerIPs {
 			peerAddresses[i] = peerIP.(string)
 		}
+		peerHandshakeRelative := time.Since(peerHandshake)
+		peerActive := peerHandshakeRelative.Minutes() < 3 // TODO: we need a better detection... ping for example?
 
 		newClientStatus := &model.ClientStatus{
-			PublicKey:        peer["public_key"].(string),
-			HasPresharedKey:  peer["has_preshared_key"].(bool),
-			ProtocolVersion:  int(peer["protocol_version"].(float64)),
-			Name:             "UNKNOWN",
-			Email:            "UNKNOWN",
-			Connected:        false,
-			AllowedIPs:       peerAddresses,
-			Endpoint:         peer["endpoint"].(string),
-			LastHandshake:    peerHandshake,
-			ReceivedBytes:    int(peer["receive_bytes"].(float64)),
-			TransmittedBytes: int(peer["transmit_bytes"].(float64)),
+			PublicKey:             peer["public_key"].(string),
+			HasPresharedKey:       peer["has_preshared_key"].(bool),
+			ProtocolVersion:       int(peer["protocol_version"].(float64)),
+			Name:                  "UNKNOWN",
+			Email:                 "UNKNOWN",
+			Connected:             peerActive,
+			AllowedIPs:            peerAddresses,
+			Endpoint:              peer["endpoint"].(string),
+			LastHandshake:         peerHandshake,
+			LastHandshakeRelative: peerHandshakeRelative,
+			ReceivedBytes:         int(peer["receive_bytes"].(float64)),
+			TransmittedBytes:      int(peer["transmit_bytes"].(float64)),
 		}
 
 		if withClientDetails {
