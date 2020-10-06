@@ -15,6 +15,10 @@
                     Server
                     <v-icon right dark>mdi-vpn</v-icon>
                 </v-btn>
+                <v-btn to="/status">
+                    Status
+                    <v-icon right dark>mdi-chart-bar</v-icon>
+                </v-btn>
             </v-toolbar-items>
 
             <v-menu

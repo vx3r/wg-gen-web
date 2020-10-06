@@ -24,7 +24,17 @@ const routes = [
     meta: {
       requiresAuth: true
     }
-  }
+  },
+  {
+    path: '/status',
+    name: 'status',
+    component: function () {
+      return import(/* webpackChunkName: "Status" */ '../views/Status.vue')
+    },
+    meta: {
+      requiresAuth: true
+    }
+  },
 ];
 
 const router = new VueRouter({
