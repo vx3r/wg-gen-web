@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"sort"
 	"time"
 
 	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/model"
@@ -172,5 +173,10 @@ func ReadClientStatus() ([]*model.ClientStatus, error) {
 
 		clientStatus = append(clientStatus, newClientStatus)
 	}
+
+	sort.Slice(clientStatus, func(i, j int) bool {
+		return clientStatus[i].LastHandshakeRelative < clientStatus[j].LastHandshakeRelative
+	})
+
 	return clientStatus, nil
 }
