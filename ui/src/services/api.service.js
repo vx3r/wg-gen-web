@@ -10,9 +10,13 @@ const ApiService = {
   get(resource) {
     return Vue.axios.get(resource)
       .then(response => response.data)
-      .catch(error => {
-        throw new Error(`ApiService: ${error}`)
-      });
+        .catch(error => {
+          if(typeof error.response !== 'undefined') {
+            throw new Error(`${error.response.status} - ${error.response.statusText}: ${error.response.data}`)
+          } else {
+            throw new Error(`ApiService: ${error}`)
+          }
+        });
   },
 
   post(resource, params) {

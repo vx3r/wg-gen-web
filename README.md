@@ -46,7 +46,7 @@ The easiest way to run Wg Gen Web is using the container image
 ```
 docker run --rm -it -v /tmp/wireguard:/data -p 8080:8080 -e "WG_CONF_DIR=/data" vx3r/wg-gen-web:latest
 ```
-Docker compose snippet, used for demo server
+Docker compose snippet, used for demo server, wg-json-api service is optional
 ```
 version: '3.6'
   wg-gen-web-demo:
@@ -70,6 +70,14 @@ version: '3.6'
       - OAUTH2_REDIRECT_URL=https://wg-gen-web-demo.127-0-0-1.fr
     volumes:
       - /etc/wireguard:/data
+  wg-json-api:
+    image: james/wg-api:latest
+    container_name: wg-json-api
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    network_mode: "host"
+    command: wg-api --device wg0 --listen localhost:8182
 ```
 Please note that mapping ```/etc/wireguard``` to ```/data``` inside the docker, will erase your host's current configuration.
 If needed, please make sure to backup your files from ```/etc/wireguard```.
@@ -177,8 +185,20 @@ OAUTH2_CLIENT_SECRET=********************
 OAUTH2_REDIRECT_URL=https://wg-gen-web-demo.127-0-0-1.fr
 ```
 
-Please fell free to test and report any bugs.
 Wg Gen Web will only access your profile to get email address and your name, no other unnecessary scopes will be requested.
+
+## WireGuard Status Display
+Wg Gen Web integrates a [WireGuard API implementation](https://github.com/jamescun/wg-api) to display client stats.
+In order to enable the Status API integration, the following settings need to be configured:
+```
+# https://github.com/jamescun/wg-api integration, user and password (basic auth) are optional
+WG_STATS_API=http://localhost:8182
+WG_STATS_API_USER=
+WG_STATS_API_PASS=
+```
+To setup the WireGuard API take a look at [https://github.com/jamescun/wg-api/blob/master/README.md](https://github.com/jamescun/wg-api/blob/master/README.md).
+
+Please fell free to test and report any bugs.
 
 ## Need Help
 
