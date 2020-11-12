@@ -601,9 +601,16 @@
         const url = window.URL.createObjectURL(new Blob([config]))
         const link = document.createElement('a')
         link.href = url
-        link.setAttribute('download', client.name.split(' ').join('-') + '.conf') //or any other extension
+        link.setAttribute('download', this.getConfigFileName(client)) //or any other extension
         document.body.appendChild(link)
         link.click()
+      },
+
+      getConfigFileName(client){
+        let name = client.name.split(' ').join('-');
+        // replace special chars
+        name = name.replace(/[^a-zA-Z0-9_-]+/g, '');
+        return name + '.conf';
       },
     }
   };
