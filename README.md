@@ -77,12 +77,15 @@ version: '3.6'
     cap_add:
       - NET_ADMIN
     network_mode: "host"
-    command: wg-api --device wg0 --listen localhost:8182
+    command: wg-api --device wg0 --listen <API_LISTEN_IP>:8182
 ```
 Please note that mapping ```/etc/wireguard``` to ```/data``` inside the docker, will erase your host's current configuration.
 If needed, please make sure to backup your files from ```/etc/wireguard```.
 
 A workaround would be to change the ```WG_INTERFACE_NAME``` to something different, as it will create a new interface (```wg-auto.conf``` for example), note that if you do so, you will have to adapt your daemon accordingly.
+
+To get the value for **<API_LISTEN_IP>** take a look at the [WireGuard Status Display](#wireguard-status-display) section. If the status display should be disabled, remove the whole service from the docker-compose file or 
+use 127.0.0.1 as <API_LISTEN_IP>.
 
 ### Directly without docker
 
@@ -192,13 +195,21 @@ Wg Gen Web integrates a [WireGuard API implementation](https://github.com/jamesc
 In order to enable the Status API integration, the following settings need to be configured:
 ```
 # https://github.com/jamescun/wg-api integration, user and password (basic auth) are optional
-WG_STATS_API=http://localhost:8182
+WG_STATS_API=http://<API_LISTEN_IP>:8182
 WG_STATS_API_USER=
 WG_STATS_API_PASS=
 ```
-To setup the WireGuard API take a look at [https://github.com/jamescun/wg-api/blob/master/README.md](https://github.com/jamescun/wg-api/blob/master/README.md).
 
-Please fell free to test and report any bugs.
+To setup the WireGuard API take a look at [https://github.com/jamescun/wg-api/blob/master/README.md](https://github.com/jamescun/wg-api/blob/master/README.md), or simply use the provided docker-compose file from above.
+
+### API_LISTEN_IP
+Due to the fact that the wg-api container operates on the host network, the wg-gen-web container cannot directly talk to the API. Thus the docker-host gateway IP of the wg-gen-web container has to be used. If the default bridge network (docker0) is used, this IP should be `172.17.0.1`. If a custom network is used, you can find the gateway IP by inspecting the output of:
+```
+docker network inspect <network name>
+```
+Use the IP address found for **Gateway** as the **API_LISTEN_IP**.
+
+Please feel free to test and report any bugs.
 
 ## Need Help
 
