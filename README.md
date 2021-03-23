@@ -49,6 +49,7 @@ docker run --rm -it -v /tmp/wireguard:/data -p 8080:8080 -e "WG_CONF_DIR=/data" 
 Docker compose snippet, used for demo server, wg-json-api service is optional
 ```
 version: '3.6'
+services:
   wg-gen-web-demo:
     image: vx3r/wg-gen-web:latest
     container_name: wg-gen-web-demo
