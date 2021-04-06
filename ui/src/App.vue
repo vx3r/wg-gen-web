@@ -4,11 +4,11 @@
     <div v-if="this.isAuthenticated">
       <Header/>
 
-      <v-content>
+      <v-main>
         <v-container>
           <router-view />
         </v-container>
-      </v-content>
+      </v-main>
 
       <Footer/>
     </div>

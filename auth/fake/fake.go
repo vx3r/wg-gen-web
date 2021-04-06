@@ -1,8 +1,8 @@
 package fake
 
 import (
-	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/model"
-	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/util"
+	"github.com/vx3r/wg-gen-web/model"
+	"github.com/vx3r/wg-gen-web/util"
 	"golang.org/x/oauth2"
 	"time"
 )

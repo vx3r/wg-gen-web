@@ -3,7 +3,10 @@ module.exports = {
     port: 8081,
     disableHostCheck: true,
   },
-  "transpileDependencies": [
+  transpileDependencies: [
     "vuetify"
-  ]
+  ],
+  pwa: {
+    name: 'Wg Gen Web',
+  }
 };

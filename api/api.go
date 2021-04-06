@@ -2,7 +2,7 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
-	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/api/v1"
+	"github.com/vx3r/wg-gen-web/api/v1"
 )
 
 // ApplyRoutes apply routes to gin engine

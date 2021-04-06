@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/model"
+	"github.com/vx3r/wg-gen-web/model"
 	"golang.org/x/oauth2"
 	oauth2Github "golang.org/x/oauth2/github"
 	"io/ioutil"

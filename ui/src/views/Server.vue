@@ -1,7 +1,7 @@
 <template>
-    <v-content>
+    <v-main>
         <Server/>
-    </v-content>
+    </v-main>
 </template>
 
 <script>

@@ -2,8 +2,8 @@ package storage
 
 import (
 	"encoding/json"
-	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/model"
-	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/util"
+	"github.com/vx3r/wg-gen-web/model"
+	"github.com/vx3r/wg-gen-web/util"
 	"os"
 	"path/filepath"
 )

@@ -2,7 +2,7 @@ package model
 
 import (
 	"fmt"
-	"gitlab.127-0-0-1.fr/vx3r/wg-gen-web/util"
+	"github.com/vx3r/wg-gen-web/util"
 	"time"
 )
 
