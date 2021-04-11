@@ -6,7 +6,7 @@ ARG COMMIT
 COPY . .
 RUN go build -o wg-gen-web-linux -ldflags="-X 'github.com/vx3r/wg-gen-web/version.Version=${COMMIT}'" github.com/vx3r/wg-gen-web/cmd/wg-gen-web
 
-FROM node:10-alpine AS build-front
+FROM node:lts-alpine AS build-front
 WORKDIR /app
 COPY ui/package*.json ./
 RUN npm install
