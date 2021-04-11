@@ -1,6 +1,6 @@
 ARG COMMIT="N/A"
 
-FROM golang:alpine AS build-back
+FROM golang:1.16 AS build-back
 WORKDIR /app
 ARG COMMIT
 COPY . .
