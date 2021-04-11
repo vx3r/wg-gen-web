@@ -7,7 +7,7 @@ Simple Web based configuration generator for [WireGuard](https://wireguard.com).
 [![Go Report Card](https://goreportcard.com/badge/github.com/vx3r/wg-gen-web)](https://goreportcard.com/report/github.com/vx3r/wg-gen-web)
 [![License: WTFPL](https://img.shields.io/badge/License-WTFPL-brightgreen.svg)](http://www.wtfpl.net/about/)
 ![Discord](https://img.shields.io/discord/681699554189377567)
-![Build multi-arch Docker Images via buildx](https://github.com/vx3r/wg-gen-web/workflows/Build%20multi-arch%20Docker%20Images%20via%20buildx/badge.svg)
+![Build docker images via buildx](https://github.com/vx3r/wg-gen-web/actions/workflows/dockerimage.yml/badge.svg)
 ![GitHub last commit](https://img.shields.io/github/last-commit/vx3r/wg-gen-web)
 ![Docker Pulls](https://img.shields.io/docker/pulls/vx3r/wg-gen-web)
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/vx3r/wg-gen-web)
