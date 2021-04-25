@@ -113,17 +113,17 @@ This `.path` will activate unit file with the same name
 ```
 # /etc/systemd/system/wg-gen-web.service
 [Unit]
-Description=Restart WireGuard
+Description=Reload WireGuard
 After=network.target
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/systemctl restart wg-quick@wg0.service
+ExecStart=/usr/bin/systemctl reload wg-quick@wg0.service
 
 [Install]
 WantedBy=multi-user.target
 ```
-Which will restart WireGuard service 
+Which will reload WireGuard service 
 
 ### Using ```inotifywait```
 For any other init system, create a daemon running this script
