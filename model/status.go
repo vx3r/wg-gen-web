@@ -22,6 +22,7 @@ type ClientStatus struct {
 	TransmittedBytes      int           `json:"transmittedBytes"`
 }
 
+// MarshalJSON structure to json
 func (c *ClientStatus) MarshalJSON() ([]byte, error) {
 
 	duration := fmt.Sprintf("%v ago", c.LastHandshakeRelative)
