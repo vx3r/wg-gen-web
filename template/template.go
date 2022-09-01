@@ -206,6 +206,10 @@ DNS = {{ StringsJoin .Server.Dns ", " }}
 {{ if ne .Server.Mtu 0 -}}
 MTU = {{.Server.Mtu}}
 {{- end}}
+{{ if ne .Client.Endpoint "" -}}
+ListenPort = {{ .Client.ListenPort }}
+{{- end }}
+
 [Peer]
 PublicKey = {{ .Server.PublicKey }}
 PresharedKey = {{ .Client.PresharedKey }}
@@ -214,6 +218,20 @@ Endpoint = {{ .Server.Endpoint }}
 {{ if and (ne .Server.PersistentKeepalive 0) (not .Client.IgnorePersistentKeepalive) -}}
 PersistentKeepalive = {{.Server.PersistentKeepalive}}
 {{- end}}
+{{- range .Peers }}
+{{ if and (ne .Id $.Client.Id) (and .Enable (ne .Endpoint "")) -}}
+[Peer]
+PublicKey = {{ .PublicKey }}
+PresharedKey = {{ .PresharedKey }}
+AllowedIPs = {{ StringsJoin .Address ", " }}
+{{ if ne .Endpoint "" -}}
+Endpoint = {{ .Endpoint }}
+{{- end }}
+{{ if and (ne $.Server.PersistentKeepalive 0) (not $.Client.IgnorePersistentKeepalive) -}}
+PersistentKeepalive = {{ $.Server.PersistentKeepalive }}
+{{- end }}
+{{- end }}
+{{ end }}
 `
 
 	wgTpl = `# Updated: {{ .Server.Updated }} / Created: {{ .Server.Created }}
@@ -230,19 +248,25 @@ PreUp = {{ .Server.PreUp }}
 PostUp = {{ .Server.PostUp }}
 PreDown = {{ .Server.PreDown }}
 PostDown = {{ .Server.PostDown }}
-{{- range .Clients }}
+{{ range .Clients }}
 {{ if .Enable -}}
 # {{.Name}} / {{.Email}} / Updated: {{.Updated}} / Created: {{.Created}}
 [Peer]
 PublicKey = {{ .PublicKey }}
 PresharedKey = {{ .PresharedKey }}
 AllowedIPs = {{ StringsJoin .Address ", " }}
+{{ if ne .Endpoint "" -}}
+Endpoint = {{ .Endpoint }}
 {{- end }}
-{{ end }}`
+{{ if ne .PersistentKeepalive 0 -}}
+PersistentKeepalive = {{ .PersistentKeepalive }}
+{{- end }}
+{{- end }}
+{{- end }}`
 )
 
 // DumpClientWg dump client wg config with go template
-func DumpClientWg(client *model.Client, server *model.Server) ([]byte, error) {
+func DumpClientWg(client *model.Client, peers []*model.Client, server *model.Server) ([]byte, error) {
 	t, err := template.New("client").Funcs(template.FuncMap{"StringsJoin": strings.Join}).Parse(clientTpl)
 	if err != nil {
 		return nil, err
@@ -250,9 +274,11 @@ func DumpClientWg(client *model.Client, server *model.Server) ([]byte, error) {
 
 	return dump(t, struct {
 		Client *model.Client
+		Peers  []*model.Client
 		Server *model.Server
 	}{
 		Client: client,
+		Peers:  peers,
 		Server: server,
 	})
 }
