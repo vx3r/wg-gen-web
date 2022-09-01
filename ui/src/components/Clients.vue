@@ -609,7 +609,7 @@
       getConfigFileName(client){
         let name = client.name.split(' ').join('-');
         // replace special chars
-        name = name.replace(/[^a-zA-Z0-9_-]+/g, '');
+        name = name.replace(/[^a-zA-Z\d_-]+/g, '');
         return name + '.conf';
       },
     }
