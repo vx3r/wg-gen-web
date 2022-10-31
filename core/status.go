@@ -4,7 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"io/ioutil"
+	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"sort"
@@ -54,7 +55,9 @@ func fetchWireGuardAPI(reqData apiRequest) (*apiResponse, error) {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Cache-Control", "no-cache")
 
-	if os.Getenv("WG_STATS_API_USER") != "" {
+	if os.Getenv("WG_STATS_API_TOKEN") != "" {
+		req.Header.Set("Authorization", fmt.Sprintf("Token %s", os.Getenv("WG_STATS_API_TOKEN")))
+	} else if os.Getenv("WG_STATS_API_USER") != "" {
 		req.SetBasicAuth(os.Getenv("WG_STATS_API_USER"), os.Getenv("WG_STATS_API_PASS"))
 	}
 
@@ -67,7 +70,7 @@ func fetchWireGuardAPI(reqData apiRequest) (*apiResponse, error) {
 		defer res.Body.Close()
 	}
 
-	body, readErr := ioutil.ReadAll(res.Body)
+	body, readErr := io.ReadAll(res.Body)
 	if readErr != nil {
 		return nil, readErr
 	}
