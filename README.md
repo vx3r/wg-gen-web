@@ -193,8 +193,13 @@ Wg Gen Web will only access your profile to get email address and your name, no 
 Wg Gen Web integrates a [WireGuard API implementation](https://github.com/jamescun/wg-api) to display client stats.
 In order to enable the Status API integration, the following settings need to be configured:
 ```
-# https://github.com/jamescun/wg-api integration, user and password (basic auth) are optional
+# https://github.com/jamescun/wg-api integration
 WG_STATS_API=http://<API_LISTEN_IP>:8182
+
+# Optional: Token Auth
+WG_STATS_API_TOKEN=
+
+# Optional: Basic Auth
 WG_STATS_API_USER=
 WG_STATS_API_PASS=
 ```
