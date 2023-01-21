@@ -9,7 +9,7 @@
   "dependencies": {
     "axios": "^0.21.4",
     "is-cidr": "^4.0.2",
-    "moment": "^2.29.1",
+    "moment": "^2.29.4",
     "vue": "^2.6.14",
     "vue-axios": "^3.4.0",
     "vue-moment": "^4.1.0",
@@ -19,7 +19,7 @@
   },
   "devDependencies": {
     "@vue/cli-plugin-router": "^4.5.15",
-    "@vue/cli-service": "^4.5.15",
+    "@vue/cli-service": "^5.0.8",
     "sass": "^1.48.0",
     "sass-loader": "^10.2.1",
     "vue-cli-plugin-vuetify": "^2.4.5",

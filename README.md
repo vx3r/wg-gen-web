@@ -24,7 +24,7 @@ The goal is to run Wg Gen Web in a container and WireGuard on host system.
 ## Features
 
  * Self-hosted and web based
- * Automatically select IP from the netowrk pool assigned to client
+ * Automatically select IP from the network pool assigned to client
  * QR-Code for convenient mobile client configuration
  * Sent email to client with QR-code and client config
  * Enable / Disable client
