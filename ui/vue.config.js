@@ -1,3 +1,5 @@
+const webpack = require("webpack");
+
 module.exports = {
   devServer: {
     port: 8081,
@@ -8,5 +10,12 @@ module.exports = {
   ],
   pwa: {
     name: 'Wg Gen Web',
+  },
+  configureWebpack: {
+    plugins: [
+      new webpack.ProvidePlugin({
+        Buffer: ["buffer", "Buffer"],
+      }),
+    ],
   }
 };
