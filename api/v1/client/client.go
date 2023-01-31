@@ -1,6 +1,8 @@
 package client
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"github.com/skip2/go-qrcode"
@@ -8,14 +10,12 @@ import (
 	"github.com/vx3r/wg-gen-web/core"
 	"github.com/vx3r/wg-gen-web/model"
 	"golang.org/x/oauth2"
-	"net/http"
 )
 
 // ApplyRoutes applies router to gin Router
 func ApplyRoutes(r *gin.RouterGroup) {
 	g := r.Group("/client")
 	{
-
 		g.POST("", createClient)
 		g.GET("/:id", readClient)
 		g.PATCH("/:id", updateClient)
