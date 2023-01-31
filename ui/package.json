@@ -18,7 +18,7 @@
     "vuex": "^3.6.2"
   },
   "devDependencies": {
-    "@vue/cli-plugin-router": "^4.5.15",
+    "@vue/cli-plugin-router": "~5.0.8",
     "@vue/cli-service": "^5.0.8",
     "sass": "^1.48.0",
     "sass-loader": "^10.2.1",
