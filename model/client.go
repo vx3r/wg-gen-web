@@ -12,11 +12,14 @@ type Client struct {
 	Name                      string    `json:"name"`
 	Email                     string    `json:"email"`
 	Enable                    bool      `json:"enable"`
+	Endpoint                  string    `json:"endpoint"`
 	IgnorePersistentKeepalive bool      `json:"ignorePersistentKeepalive"`
 	PresharedKey              string    `json:"presharedKey"`
 	AllowedIPs                []string  `json:"allowedIPs"`
 	Address                   []string  `json:"address"`
 	Tags                      []string  `json:"tags"`
+	ListenPort                int       `json:"listenPort"`
+	PersistentKeepalive       int       `json:"persistentKeepalive"`
 	PrivateKey                string    `json:"privateKey"`
 	PublicKey                 string    `json:"publicKey"`
 	CreatedBy                 string    `json:"createdBy"`
@@ -62,6 +65,10 @@ func (a Client) IsValid() []error {
 		if !util.IsValidCidr(address) {
 			errs = append(errs, fmt.Errorf("address %s is invalid", address))
 		}
+	}
+
+	if a.Endpoint != "" && a.ListenPort == 0 {
+		errs = append(errs, fmt.Errorf("if an endpoint is specified, a port to listen on is required"))
 	}
 
 	return errs

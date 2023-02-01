@@ -256,6 +256,16 @@
                                         label="Client email"
                                         :rules="[ v => (/.+@.+\..+/.test(v) || v === '') || 'E-mail must be valid',]"
                                 />
+                                <v-text-field
+                                        v-model="client.endpoint"
+                                        label="Static Endpoint"
+                                        :rules="[ v => (/.+:.+/.test(v) || v === '') || 'Endpoint must contain port',]"
+                                />
+                                <v-text-field
+                                        v-model.number="client.listenPort"
+                                        label="Listening Port"
+                                        type="number"
+                                />
                                 <v-select
                                         v-model="client.address"
                                         :items="server.address"
@@ -370,6 +380,16 @@
                                         :rules="[ v => (/.+@.+\..+/.test(v) || v === '') || 'E-mail must be valid',]"
                                         required
                                 />
+                                <v-text-field
+                                        v-model="client.endpoint"
+                                        label="Static Endpoint"
+                                        :rules="[ v => (/.+:.+/.test(v) || v === '') || 'Endpoint must contain port',]"
+                                />
+                                <v-text-field
+                                        v-model.number="client.listenPort"
+                                        label="Listening Port"
+                                        type="number"
+                                />
                                 <v-combobox
                                         v-model="client.address"
                                         chips
@@ -479,6 +499,8 @@
         { text: 'Name', value: 'name', },
         { text: 'Email', value: 'email', },
         { text: 'IP addresses', value: 'address', },
+        { text: 'Endpoint', value: 'endpoint', },
+        { text: 'ListenPort', value: 'listenPort', },
         { text: 'Tags', value: 'tags', },
         { text: 'Created', value: 'created', sortable: false, },
         { text: 'Updated', value: 'updated', sortable: false, },
@@ -519,6 +541,8 @@
         this.client = {
           name: "",
           email: "",
+          endpoint: "",
+          listenPort: 0,
           enable: true,
           allowedIPs: this.server.allowedips,
           address: this.server.address,

@@ -185,6 +185,11 @@ func ReadClients() ([]*model.Client, error) {
 
 // ReadClientConfig in wg format
 func ReadClientConfig(id string) ([]byte, error) {
+	peers, err := ReadClients()
+	if err != nil {
+		return nil, err
+	}
+
 	client, err := ReadClient(id)
 	if err != nil {
 		return nil, err
@@ -195,7 +200,7 @@ func ReadClientConfig(id string) ([]byte, error) {
 		return nil, err
 	}
 
-	configDataWg, err := template.DumpClientWg(client, server)
+	configDataWg, err := template.DumpClientWg(client, peers, server)
 	if err != nil {
 		return nil, err
 	}
