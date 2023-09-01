@@ -42,7 +42,7 @@ func (a Server) IsValid() []error {
 	}
 	// check if the listenPort is valid
 	if a.ListenPort < 0 || a.ListenPort > 65535 {
-		errs = append(errs, fmt.Errorf("listenPort %s is invalid", a.ListenPort))
+		errs = append(errs, fmt.Errorf("listenPort %d is invalid", a.ListenPort))
 	}
 	// check if the endpoint empty
 	if a.Endpoint == "" {
