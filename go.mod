@@ -5,7 +5,7 @@ go 1.21
 require (
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/danielkov/gin-helmet v0.0.0-20171108135313-1387e224435e
-	github.com/gin-contrib/cors v1.3.1
+	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-contrib/static v0.0.1
 	github.com/gin-gonic/gin v1.9.1
 	github.com/joho/godotenv v1.4.0
