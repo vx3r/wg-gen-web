@@ -1,25 +1,33 @@
+### Back-End
+FROM golang:alpine AS go-base
+ENV CGO_ENABLED=0
+WORKDIR /app
+COPY go.mod go.sum ./
+RUN go mod download
+
+FROM go-base AS build-back
 ARG COMMIT="N/A"
-
-FROM golang:alpine AS build-back
-WORKDIR /app
-ARG COMMIT
 COPY . .
-RUN go build -o wg-gen-web-linux -ldflags="-X 'github.com/vx3r/wg-gen-web/version.Version=${COMMIT::7}'" github.com/vx3r/wg-gen-web/cmd/wg-gen-web
+RUN go install -ldflags "-w -s -X 'github.com/vx3r/wg-gen-web/version.Version=${COMMIT::7}'" ./cmd/...
 
-FROM node:18.13.0-alpine AS build-front
+### Front-End
+FROM node:18-alpine AS node-base
 WORKDIR /app
-COPY ui/package*.json ./
-RUN npm install
-COPY ui/ ./
+COPY ui/package.json ui/package-lock.json ./
+RUN npm ci --no-fund
+
+FROM node-base AS build-front
+COPY ui/ .
 RUN npm run build
 
-FROM alpine
+### Final
+FROM alpine AS final-base
+RUN apk add -U --no-cache ca-certificates
 WORKDIR /app
-COPY --from=build-back /app/wg-gen-web-linux .
-COPY --from=build-front /app/dist ./ui/dist
 COPY .env .
-RUN chmod +x ./wg-gen-web-linux
-RUN apk add --no-cache ca-certificates
+COPY --from=build-back /go/bin/wg-gen-web .
+COPY --from=build-front /app/dist ./ui/dist
+RUN chmod +x ./wg-gen-web
 EXPOSE 8080
 
-CMD ["/app/wg-gen-web-linux"]
+CMD ["/app/wg-gen-web"]
