@@ -234,6 +234,7 @@ PostDown = {{ .Server.PostDown }}
 {{ if .Enable -}}
 # {{.Name}} / {{.Email}} / Updated: {{.Updated}} / Created: {{.Created}}
 [Peer]
+# friendly_name = {{.Name}}
 PublicKey = {{ .PublicKey }}
 PresharedKey = {{ .PresharedKey }}
 AllowedIPs = {{ StringsJoin .Address ", " }}
