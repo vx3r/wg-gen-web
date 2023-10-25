@@ -1,4 +1,4 @@
-name: Build multi-platform docker images via buildx
+name: Docker Build
 
 on:
   pull_request:
@@ -10,58 +10,50 @@ on:
     tags:
       - 'v*.*.*'
 
+env:
+  IMAGE_NAME: ${{ vars.IMAGE_NAME || github.repository }}
+  IMAGE_PLATFORMS: ${{ vars.IMAGE_PLATFORMS || 'linux/amd64,linux/arm64,linux/arm/v7' }}
+  REGISTRY: ${{ vars.REGISTRY_NAME || secrets.REGISTRY_NAME || 'docker.io' }}
+
 jobs:
   docker:
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v2
-      -
-        name: Set Prepare
-        id: prep
-        run: |
-          DOCKER_IMAGE=vx3r/wg-gen-web
-          VERSION=edge
-          if [[ $GITHUB_REF == refs/tags/* ]]; then
-          VERSION=${GITHUB_REF#refs/tags/}
-          elif [[ $GITHUB_REF == refs/heads/* ]]; then
-          VERSION=$(echo ${GITHUB_REF#refs/heads/} | sed -r 's#/+#-#g')
-          elif [[ $GITHUB_REF == refs/pull/* ]]; then
-          VERSION=pr-${{ github.event.number }}
-          fi
-          TAGS="${DOCKER_IMAGE}:${VERSION}"
-          if [ "${{ github.event_name }}" = "push" ]; then
-          TAGS="$TAGS,${DOCKER_IMAGE}:sha-${GITHUB_SHA::8}"
-          fi
-          TAGS="$TAGS,${DOCKER_IMAGE}:latest"
-          echo ::set-output name=version::${VERSION}
-          echo ::set-output name=tags::${TAGS}
-          echo ::set-output name=created::$(date -u +'%Y-%m-%dT%H:%M:%SZ')
-          echo ::set-output name=sha_short::$(git rev-parse --short HEAD)
-      -
-        name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-      -
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-      -
-        name: Login to DockerHub
-        uses: docker/login-action@v1
+      # https://github.com/actions/checkout
+      - uses: actions/checkout@v4
+
+      # https://github.com/docker/login-action
+      - uses: docker/login-action@v3
+        if: ${{ github.event_name != 'pull_request' }}
         with:
-          username: ${{ secrets.DOCKER_LOGIN_USERNAME }}
-          password: ${{ secrets.DOCKER_LOGIN_PASSWORD }}
-      -
-        name: Build and push
-        uses: docker/build-push-action@v2
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.DOCKER_LOGIN_USERNAME || secrets.REGISTRY_USERNAME || github.actor }}
+          password: ${{ secrets.DOCKER_LOGIN_PASSWORD || secrets.REGISTRY_PASSWORD || github.token }}
+
+      # https://github.com/docker/setup-buildx-action
+      - uses: docker/setup-buildx-action@v3
+
+      # https://github.com/docker/setup-qemu-action
+      - uses: docker/setup-qemu-action@v3
+
+      # https://github.com/docker/metadata-action
+      - uses: docker/metadata-action@v5
+        id: meta
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=tag
+            type=ref,event=pr
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=sha
+
+      # https://github.com/docker/build-push-action
+      - uses: docker/build-push-action@v5
         with:
           context: .
-          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          platforms: ${{ env.IMAGE_PLATFORMS }}
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.prep.outputs.tags }}
-          labels: |
-            org.opencontainers.image.source=${{ github.event.repository.html_url }}
-            org.opencontainers.image.created=${{ steps.prep.outputs.created }}
-            org.opencontainers.image.revision=${{ github.sha }}
-          build-args: |
-            COMMIT=${{ steps.prep.outputs.sha_short }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: COMMIT=${{ github.sha }}
